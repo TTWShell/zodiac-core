@@ -1,0 +1,23 @@
+// Package cmd defines the application's command tree.
+package cmd
+
+import "github.com/spf13/cobra"
+
+var configDirectory string
+
+var rootCmd = &cobra.Command{
+	Use:           "{{.Name}}",
+	Short:         "{{.Name}} service commands",
+	Args:          cobra.NoArgs,
+	SilenceUsage:  true,
+	SilenceErrors: true,
+}
+
+// Execute runs the command tree. Child commands register themselves in init.
+func Execute() error {
+	return rootCmd.Execute()
+}
+
+func init() {
+	rootCmd.PersistentFlags().StringVar(&configDirectory, "config-dir", "config", "Configuration search directory")
+}

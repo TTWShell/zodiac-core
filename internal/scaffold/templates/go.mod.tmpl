@@ -1,0 +1,12 @@
+module {{.Module}}
+
+go 1.26.0
+
+require (
+	github.com/TTWShell/zodiac-core {{.CoreVersion}}
+	github.com/spf13/cobra v1.10.2
+	go.uber.org/fx v1.24.0
+)
+{{if .CorePath}}
+replace github.com/TTWShell/zodiac-core => {{printf "%q" .CorePath}}
+{{end}}

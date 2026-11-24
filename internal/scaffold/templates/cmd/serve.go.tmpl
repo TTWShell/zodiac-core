@@ -1,0 +1,26 @@
+package cmd
+
+import (
+	"github.com/spf13/cobra"
+
+	"{{.Module}}/internal/app"
+	"{{.Module}}/internal/config"
+)
+
+var serveCmd = &cobra.Command{
+	Use:   "serve",
+	Short: "Start the HTTP server",
+	Args:  cobra.NoArgs,
+	RunE: func(cmd *cobra.Command, args []string) error {
+		options := config.Options{Directory: configDirectory}
+		cfg, err := config.Load(options)
+		if err != nil {
+			return err
+		}
+		return app.Run(cmd.Context(), cfg)
+	},
+}
+
+func init() {
+	rootCmd.AddCommand(serveCmd)
+}

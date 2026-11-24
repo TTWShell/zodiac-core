@@ -1,0 +1,47 @@
+// Package app assembles dependencies and manages the application lifecycle.
+package app
+
+import (
+	"context"
+	"errors"
+	"fmt"
+
+	"go.uber.org/fx"
+
+	"{{.Module}}/internal/config"
+)
+
+// Run starts this application's dependencies and waits for cancellation,
+// SIGINT, SIGTERM, or an internal shutdown request.
+func Run(ctx context.Context, cfg *config.Config) error {
+	application := fx.New(
+		fx.Supply(cfg),
+		fx.Provide(func(cfg *config.Config) config.HTTPConfig { return cfg.HTTP }, newServer),
+		fx.Invoke(registerServer),
+	)
+	if err := application.Err(); err != nil {
+		return err
+	}
+	done := application.Wait()
+	startCtx, cancelStart := context.WithTimeout(ctx, application.StartTimeout())
+	err := application.Start(startCtx)
+	cancelStart()
+	if err != nil {
+		return err
+	}
+
+	var runErr error
+	select {
+	case signal := <-done:
+		if signal.ExitCode != 0 {
+			runErr = fmt.Errorf("application requested shutdown with exit code %d", signal.ExitCode)
+		}
+	case <-ctx.Done():
+		runErr = ctx.Err()
+	}
+
+	// Shutdown gets a fresh deadline even if the command context was canceled.
+	stopCtx, cancelStop := context.WithTimeout(context.Background(), application.StopTimeout())
+	defer cancelStop()
+	return errors.Join(runErr, application.Stop(stopCtx))
+}

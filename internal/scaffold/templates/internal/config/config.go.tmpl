@@ -1,0 +1,69 @@
+// Package config owns this application's configuration schema and bindings.
+package config
+
+import (
+	"errors"
+	"net"
+	"strconv"
+	"time"
+
+	zconfig "github.com/TTWShell/zodiac-core/config"
+)
+
+// Options selects the configuration directory.
+type Options struct {
+	Directory string
+}
+
+// HTTPConfig configures the HTTP listener and request header timeout.
+type HTTPConfig struct {
+	Addr              string        `mapstructure:"addr"`
+	ReadHeaderTimeout time.Duration `mapstructure:"read_header_timeout"`
+}
+
+// Config holds the application's settings and resolved environment.
+type Config struct {
+	HTTP HTTPConfig `mapstructure:"http"`
+	Env  zconfig.Environment `mapstructure:"-"`
+}
+
+var _ zconfig.Validator = (*Config)(nil)
+
+// Load reads and validates settings using the application's environment bindings.
+func Load(options Options) (*Config, error) {
+	directory := options.Directory
+	if directory == "" {
+		directory = "config"
+	}
+	loadOptions := zconfig.Options{
+		SearchPaths: []string{directory},
+		EnvBindings: map[string]string{
+			"http.addr": "{{envPrefix .Name}}_HTTP_ADDR",
+		},
+	}
+	source, err := zconfig.Read(loadOptions)
+	if err != nil {
+		return nil, err
+	}
+	cfg := &Config{Env: source.Environment()}
+	if err := source.Decode(cfg); err != nil {
+		return nil, err
+	}
+	return cfg, nil
+}
+
+// Validate checks the listen address, port range, and positive header timeout.
+func (c *Config) Validate() error {
+	_, port, err := net.SplitHostPort(c.HTTP.Addr)
+	if err != nil {
+		return errors.New("http.addr must be a host:port listen address")
+	}
+	number, err := strconv.Atoi(port)
+	if err != nil || number < 0 || number > 65535 {
+		return errors.New("http.addr must contain a port between 0 and 65535")
+	}
+	if c.HTTP.ReadHeaderTimeout <= 0 {
+		return errors.New("http.read_header_timeout must be positive")
+	}
+	return nil
+}

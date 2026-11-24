@@ -1,0 +1,44 @@
+# {{.Name}}
+
+Requires Go 1.26.0 or newer.
+
+## Run locally
+
+```sh
+go mod tidy
+APPLICATION_ENVIRONMENT=develop go run . serve --config-dir ./config
+```
+
+Check the service:
+
+```sh
+curl http://127.0.0.1:8080/health
+```
+
+The response is `{"status":"ok"}`. Press Ctrl+C to stop.
+
+## Configuration
+
+Edit `config/app.yaml` for shared settings and `config/app.<environment>.yaml`
+for environment-specific settings. Set `APPLICATION_ENVIRONMENT` to choose the
+runtime environment; the default is `production`.
+
+Use `--config-dir` to specify a different configuration directory. Override the
+HTTP listen address with `{{envPrefix .Name}}_HTTP_ADDR`:
+
+```sh
+APPLICATION_ENVIRONMENT=develop {{envPrefix .Name}}_HTTP_ADDR=127.0.0.1:9090 go run . serve
+```
+
+## Build and run
+
+```sh
+go build -o bin/{{.Name}} .
+APPLICATION_ENVIRONMENT=production ./bin/{{.Name}} serve --config-dir ./config
+```
+{{if .CorePath}}
+## Local dependency
+
+`go.mod` references a local ZodiacCore checkout at `{{.CorePath}}`.
+Update the `replace` path if the checkout moves.
+{{end}}
