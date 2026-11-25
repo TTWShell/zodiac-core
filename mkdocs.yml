@@ -1,0 +1,37 @@
+site_name: ZodiacCore Go
+strict: true
+site_description: Shared foundations for Go services.
+site_url: https://ttwshell.github.io/zodiac-core/
+repo_url: https://github.com/TTWShell/zodiac-core
+edit_uri: ''
+exclude_docs: |
+  requirements.txt
+
+theme:
+  name: material
+  features:
+    - content.code.copy
+    - navigation.sections
+
+plugins:
+  - search
+  - mike:
+      alias_type: redirect
+
+extra:
+  version:
+    provider: mike
+
+markdown_extensions:
+  - pymdownx.highlight
+  - pymdownx.superfences
+
+nav:
+  - Overview: index.md
+  - Create a service: getting-started.md
+  - Add a business endpoint: http.md
+  - Existing applications: existing-application.md
+  - Configure your application: configuration.md
+  - Write and correlate logs: logging.md
+  - CLI installation and options: cli.md
+  - API reference: https://pkg.go.dev/github.com/TTWShell/zodiac-core

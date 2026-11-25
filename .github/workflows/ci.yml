@@ -1,0 +1,84 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [master]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    name: Go ${{ matrix.go }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        go: ['1.26.0', '1.26.x', '1.27.x']
+    env:
+      GOTOOLCHAIN: local
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-go@v6
+        with:
+          go-version: ${{ matrix.go }}
+          cache: true
+      - run: go version
+      - name: Check formatting
+        if: matrix.go == '1.26.0'
+        run: |
+          unformatted="$(gofmt -l .)"
+          if [ -n "$unformatted" ]; then
+            printf '%s\n' "$unformatted"
+            exit 1
+          fi
+      - name: Check dependencies
+        if: matrix.go == '1.26.0'
+        run: |
+          go mod tidy
+          git diff --exit-code -- go.mod go.sum
+      - run: go vet ./...
+      - run: go test -race ./...
+      - name: Check generated service
+        run: |
+          project="$(mktemp -d)"
+          server_pid=""
+          cleanup() {
+            result=$?
+            if [ -n "$server_pid" ]; then
+              kill "$server_pid" 2>/dev/null || true
+              wait "$server_pid" 2>/dev/null || true
+            fi
+            if [ "$result" -ne 0 ] && [ -f "$project/server.log" ]; then
+              cat "$project/server.log"
+            fi
+            rm -rf "$project"
+          }
+          trap cleanup EXIT
+          go run ./cmd/zodiac new smoke-service --module example.com/smoke-service \
+            --core-path "$PWD" --output "$project"
+          cd "$project"
+          go mod tidy
+          go build -o service .
+          APPLICATION_ENVIRONMENT=develop SMOKE_SERVICE_HTTP_ADDR=127.0.0.1:18080 \
+            ./service serve --config-dir ./config >server.log 2>&1 &
+          server_pid=$!
+          for attempt in {1..50}; do
+            kill -0 "$server_pid"
+            if curl --noproxy '*' --silent --fail --max-time 1 http://127.0.0.1:18080/health -o health.json; then
+              break
+            fi
+            sleep 0.2
+          done
+          jq -e '. == {code: 0, data: {status: "ok"}, message: "Success"}' health.json
+          curl --noproxy '*' --fail --silent --show-error --max-time 5 http://127.0.0.1:18080/openapi.json \
+            | jq -e '.paths["/health"].get.operationId == "get-health"'
+          kill -TERM "$server_pid"
+          wait "$server_pid"
+          server_pid=""
