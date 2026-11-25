@@ -1,0 +1,26 @@
+// Package health exposes the service health endpoint.
+package health
+
+import (
+	"context"
+	"net/http"
+
+	"github.com/danielgtaylor/huma/v2"
+
+	humatransport "github.com/TTWShell/zodiac-core/transport/huma"
+)
+
+type Status struct {
+	Status string `json:"status"`
+}
+
+func Register(api huma.API) {
+	humatransport.Register(api, huma.Operation{
+		OperationID: "get-health",
+		Method:      http.MethodGet,
+		Path:        "/health",
+		Summary:     "Check service health",
+	}, func(ctx context.Context, input *struct{}) (*Status, error) {
+		return &Status{Status: "ok"}, nil
+	})
+}

@@ -5,10 +5,12 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"net/http"
 
 	"go.uber.org/fx"
 
 	"{{.Module}}/internal/config"
+	"{{.Module}}/internal/health"
 )
 
 // Run starts this application's dependencies and waits for cancellation,
@@ -17,7 +19,8 @@ func Run(ctx context.Context, cfg *config.Config) error {
 	application := fx.New(
 		fx.Supply(cfg),
 		fx.Provide(func(cfg *config.Config) config.HTTPConfig { return cfg.HTTP }, newServer),
-		fx.Invoke(registerServer),
+		fx.Provide(fx.Annotate(newRouter, fx.As(new(http.Handler)), fx.As(fx.Self())), newAPI),
+		fx.Invoke(health.Register, registerServer),
 	)
 	if err := application.Err(); err != nil {
 		return err

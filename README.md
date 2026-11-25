@@ -4,8 +4,7 @@ A public Go library with a Cobra-based developer CLI. `zodiac new` generates a
 business service that consumes the library.
 
 The project follows the design of [ZodiacCore-Py](https://github.com/TTWShell/ZodiacCore-Py),
-adapted to Go and its ecosystem. This is the design baseline for all modules;
-implementation choices use Go conventions, Fx, Cobra, and Viper where appropriate.
+adapted to Go and its ecosystem.
 
 ## Generate a project locally
 
@@ -32,7 +31,9 @@ In another terminal:
 curl http://127.0.0.1:8080/health
 ```
 
-The response is `{"status":"ok"}`. Ctrl+C gracefully stops the application.
+The response is `{"code":0,"data":{"status":"ok"},"message":"Success"}`.
+API documentation is at `/docs`, with OpenAPI at `/openapi.json`.
+Ctrl+C gracefully stops the application.
 
 ## Build the developer CLI
 
@@ -72,18 +73,70 @@ demo-service/
 └── internal/
     ├── app/
     │   ├── app.go
+    │   ├── router.go
     │   └── server.go
-    └── config/
-        └── config.go
+    ├── config/
+    │   └── config.go
+    └── health/
+        └── health.go
 ```
 
-The generated application owns its Cobra commands, Fx assembly, HTTP server,
-and startup/shutdown. Each command has its own file, following the default
-`cobra-cli` layout. The initial HTTP example uses `net/http` and a health endpoint;
-Gin, chi, databases, and other runtime capabilities are not selected here.
+## HTTP APIs
 
-The template depends on ZodiacCore's public configuration package, Cobra, and Fx.
-Generated source belongs to the business project and runs without the Zodiac CLI.
+Create a Huma API with `humatransport.DefaultConfig` and register operations with
+`humatransport.Register`. Both are in `github.com/TTWShell/zodiac-core/transport/huma`.
+The configuration works with Huma router adapters; the generated application uses
+`humachi.New`.
+
+```go
+type Greeting struct {
+    Name string `json:"name"`
+}
+
+humatransport.Register(api, huma.Operation{
+    OperationID: "get-greeting",
+    Method:      http.MethodGet,
+    Path:        "/greeting",
+}, func(ctx context.Context, input *struct{}) (*Greeting, error) {
+    return &Greeting{Name: "world"}, nil
+})
+```
+
+`Register` takes a handler returning `(T, error)`, where `T` is the business data.
+The response is `{"code":0,"data":...,"message":"Success"}`.
+Nil data produces `data: null`. Set the operation's `DefaultStatus` to 201 for HTTP 201 with business
+code 201 and message `Created`.
+
+Use `RegisterOutput` when the handler needs Huma's complete output contract:
+response headers, explicit envelopes, raw bytes, streaming or no-body responses.
+It preserves the returned output without automatic wrapping. For an explicit
+Zodiac envelope, use a value `humatransport.Body[T]` as the output's `Body`:
+
+```go
+type GreetingOutput struct {
+    ETag string `header:"ETag"`
+    Body humatransport.Body[Greeting]
+}
+```
+
+Populate that body with a struct literal or convert `response.OK(data)` to
+`humatransport.Body[Greeting]`. Use native `Body []byte` for raw responses,
+`Body func(huma.Context)` for streams, and an output without `Body` for 204.
+Register routes before serving requests; declare additional response statuses
+and custom media types using Huma's operation fields.
+
+Both registration functions preserve public errors and hide unknown failures.
+Use `response.NewError(status, message)` for business errors; its `Code` and
+`Data` fields are independent of the HTTP status. Explicit Huma errors retain
+their messages and headers, and validation errors retain Huma's native 422
+format. Unknown errors are logged and return a generic Zodiac 500 response.
+
+`httptransport.Middleware` from `transport/http` adds request IDs, optional service
+names, access logs and panic recovery to `net/http` handlers. Its options support
+an exact-path log exclusion list, a custom ID header/generator, and a `*slog.Logger`.
+Use `requestctx.RequestID(ctx)`, `requestctx.ServiceName(ctx)` and
+`requestctx.Logger(ctx)` in business code. Use context methods such as
+`InfoContext(ctx, ...)` to include the current request ID and service.
 
 ## Configuration
 
@@ -109,20 +162,6 @@ Maps merge recursively across files; other values, including lists and null,
 replace earlier values. The final result is decoded into the application's types.
 Missing fields retain application defaults; explicit null resets a field to its
 Go zero value before application validation runs.
-
-## Repository structure
-
-```text
-cmd/zodiac/main.go             Developer CLI executable
-config/                       Public configuration library
-internal/cli/root.go           Root command assembly
-internal/cli/new.go            New-project command
-internal/scaffold/             Validation, rendering, and file generation
-internal/scaffold/templates/   Embedded business-project template
-```
-
-Generator internals are not part of the public runtime API. Project files, comments, CLI
-help, and documentation use English.
 
 ## Check
 

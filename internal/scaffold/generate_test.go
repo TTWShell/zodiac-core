@@ -41,6 +41,8 @@ func TestGenerateStandaloneProject(t *testing.T) {
 				"cmd/serve.go":               `"example.com/team/demo/v2/internal/app"`,
 				"internal/app/app.go":        "",
 				"internal/app/server.go":     "",
+				"internal/app/router.go":     "",
+				"internal/health/health.go":  "",
 				"internal/config/config.go":  "DEMO_SERVICE_HTTP_ADDR",
 				"config/app.yaml":            "",
 				"config/app.develop.yaml":    "",

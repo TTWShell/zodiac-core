@@ -1,0 +1,34 @@
+package app
+
+import (
+	"net/http"
+
+	"github.com/danielgtaylor/huma/v2"
+	"github.com/danielgtaylor/huma/v2/adapters/humachi"
+	"github.com/go-chi/chi/v5"
+
+	httptransport "github.com/TTWShell/zodiac-core/transport/http"
+	humatransport "github.com/TTWShell/zodiac-core/transport/huma"
+)
+
+func newRouter() *chi.Mux {
+	router := chi.NewRouter()
+	router.Use(httptransport.Middleware(httptransport.Options{ServiceName: "{{.Name}}"}))
+	router.NotFound(httptransport.ErrorHandler(http.StatusNotFound))
+	router.MethodNotAllowed(func(w http.ResponseWriter, r *http.Request) {
+		for _, method := range []string{
+			http.MethodGet, http.MethodHead, http.MethodPost, http.MethodPut,
+			http.MethodPatch, http.MethodDelete, http.MethodConnect, http.MethodOptions, http.MethodTrace,
+		} {
+			if router.Match(chi.NewRouteContext(), method, r.URL.Path) {
+				w.Header().Add("Allow", method)
+			}
+		}
+		httptransport.ErrorHandler(http.StatusMethodNotAllowed)(w, r)
+	})
+	return router
+}
+
+func newAPI(router *chi.Mux) huma.API {
+	return humachi.New(router, humatransport.DefaultConfig("{{.Name}}", "1.0.0"))
+}

@@ -3,6 +3,7 @@ package config
 import (
 	"errors"
 	"fmt"
+	"maps"
 	"os"
 	"reflect"
 	"slices"
@@ -11,6 +12,7 @@ import (
 	"github.com/go-viper/mapstructure/v2"
 	"github.com/spf13/cast"
 	"github.com/spf13/viper"
+	"github.com/tiendc/go-deepcopy"
 )
 
 // Source is a startup snapshot of merged files and explicitly bound environment
@@ -63,11 +65,7 @@ func Read(opts Options) (*Source, error) {
 	if err := v.MergeConfigMap(merged); err != nil {
 		return nil, fmt.Errorf("config: initialize merged configuration: %w", err)
 	}
-	keys := make([]string, 0, len(opts.EnvBindings))
-	for key := range opts.EnvBindings {
-		keys = append(keys, key)
-	}
-	slices.Sort(keys)
+	keys := slices.Sorted(maps.Keys(opts.EnvBindings))
 	seen := make(map[string]string, len(keys))
 	for _, key := range keys {
 		variable := opts.EnvBindings[key]
@@ -147,27 +145,6 @@ func setValue(values map[string]any, path []string, value any) {
 		values = nested
 	}
 	values[path[len(path)-1]] = value
-}
-
-// cloneValue copies the maps and slices produced by YAML loading. Scalars and
-// bound environment strings can be reused without sharing mutable data.
-func cloneValue(value any) any {
-	switch value := value.(type) {
-	case map[string]any:
-		result := make(map[string]any, len(value))
-		for key, item := range value {
-			result[key] = cloneValue(item)
-		}
-		return result
-	case []any:
-		result := slices.Clone(value)
-		for i, item := range value {
-			result[i] = cloneValue(item)
-		}
-		return result
-	default:
-		return value
-	}
 }
 
 // Mapstructure dereferences prefilled struct pointers before decoding fields.
@@ -269,8 +246,14 @@ func (s *Source) decode(key string, target any) error {
 	}
 	// Decode a private copy while retaining Viper's conversion behavior and
 	// preserving empty maps and nulls for strict decoding.
+	var values any
+	if data := s.values.Get(path); data != nil {
+		if err := deepcopy.Copy(&values, data); err != nil {
+			return fmt.Errorf("config: copy configuration: %w", err)
+		}
+	}
 	input := viper.New()
-	input.Set("values", cloneValue(s.values.Get(path)))
+	input.Set("values", values)
 	if err := input.UnmarshalKey("values", target, options...); err != nil {
 		return fmt.Errorf("config: decode section %q: %w", key, err)
 	}
