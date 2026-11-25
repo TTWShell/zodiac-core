@@ -5,9 +5,11 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"log/slog"
 	"net/http"
 
 	"go.uber.org/fx"
+	"go.uber.org/fx/fxevent"
 
 	"{{.Module}}/internal/config"
 	"{{.Module}}/internal/health"
@@ -15,9 +17,14 @@ import (
 
 // Run starts this application's dependencies and waits for cancellation,
 // SIGINT, SIGTERM, or an internal shutdown request.
-func Run(ctx context.Context, cfg *config.Config) error {
+func Run(ctx context.Context, cfg *config.Config, logger *slog.Logger) error {
 	application := fx.New(
-		fx.Supply(cfg),
+		fx.Supply(cfg, logger),
+		fx.WithLogger(func(logger *slog.Logger) fxevent.Logger {
+			events := &fxevent.SlogLogger{Logger: logger.With("component", "fx")}
+			events.UseLogLevel(slog.LevelDebug)
+			return events
+		}),
 		fx.Provide(func(cfg *config.Config) config.HTTPConfig { return cfg.HTTP }, newServer),
 		fx.Provide(fx.Annotate(newRouter, fx.As(new(http.Handler)), fx.As(fx.Self())), newAPI),
 		fx.Invoke(health.Register, registerServer),

@@ -1,15 +1,20 @@
 package main
 
 import (
-	"fmt"
+	"log/slog"
 	"os"
+
+	"github.com/TTWShell/zodiac-core/logging"
 
 	"{{.Module}}/cmd"
 )
 
 func main() {
+	logger := logging.New("{{.Name}}", slog.LevelInfo)
+	slog.SetDefault(logger)
+
 	if err := cmd.Execute(); err != nil {
-		fmt.Fprintln(os.Stderr, err)
+		logger.Error("Command failed", "error", err)
 		os.Exit(1)
 	}
 }

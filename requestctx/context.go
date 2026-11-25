@@ -57,27 +57,49 @@ func contextualLogger(logger *slog.Logger) *slog.Logger {
 	if _, ok := logger.Handler().(*logHandler); ok {
 		return logger
 	}
-	return slog.New(&logHandler{logger.Handler()})
+	return slog.New(NewLogHandler(logger.Handler(), ""))
+}
+
+// NewLogHandler adds request metadata to records before passing them to next.
+// The context's service name overrides defaultService. Use the logger's Context
+// methods to supply request metadata. This does not change the default logger.
+// Let this handler own request_id and service; do not also bind those attributes.
+func NewLogHandler(next slog.Handler, defaultService string) slog.Handler {
+	return &logHandler{next: next, defaultService: defaultService}
 }
 
 // logHandler is the single owner of request metadata in log records.
-type logHandler struct{ slog.Handler }
+type logHandler struct {
+	next           slog.Handler
+	defaultService string
+}
+
+func (h *logHandler) Enabled(ctx context.Context, level slog.Level) bool {
+	return h.next.Enabled(ctx, level)
+}
 
 func (h *logHandler) Handle(ctx context.Context, record slog.Record) error {
 	record = record.Clone()
 	if id := RequestID(ctx); id != "" {
 		record.AddAttrs(slog.String("request_id", id))
 	}
-	if service := ServiceName(ctx); service != "" {
+	service := ServiceName(ctx)
+	if service == "" {
+		service = h.defaultService
+	}
+	if service != "" {
 		record.AddAttrs(slog.String("service", service))
 	}
-	return h.Handler.Handle(ctx, record)
+	return h.next.Handle(ctx, record)
 }
 
 func (h *logHandler) WithAttrs(attrs []slog.Attr) slog.Handler {
-	return &logHandler{h.Handler.WithAttrs(attrs)}
+	return &logHandler{next: h.next.WithAttrs(attrs), defaultService: h.defaultService}
 }
 
 func (h *logHandler) WithGroup(name string) slog.Handler {
-	return &logHandler{h.Handler.WithGroup(name)}
+	if name == "" {
+		return h
+	}
+	return &logHandler{next: h.next.WithGroup(name), defaultService: h.defaultService}
 }

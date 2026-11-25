@@ -1,6 +1,8 @@
 package cmd
 
 import (
+	"log/slog"
+
 	"github.com/spf13/cobra"
 
 	"{{.Module}}/internal/app"
@@ -17,7 +19,7 @@ var serveCmd = &cobra.Command{
 		if err != nil {
 			return err
 		}
-		return app.Run(cmd.Context(), cfg)
+		return app.Run(cmd.Context(), cfg, slog.Default())
 	},
 }
 
