@@ -33,5 +33,7 @@ func newRouter(logger *slog.Logger) *chi.Mux {
 func newHandler(router *chi.Mux) http.Handler { return router }
 
 func newAPI(router *chi.Mux) huma.API {
+	huma.NewError = humatransport.NewError
+	huma.NewErrorWithContext = humatransport.NewErrorWithContext
 	return humachi.New(router, humatransport.DefaultConfig("{{.Name}}", "1.0.0"))
 }

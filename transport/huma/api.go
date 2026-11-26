@@ -3,20 +3,18 @@ package humatransport
 
 import (
 	"context"
-	"errors"
 	"maps"
 	"net/http"
 	"reflect"
-	"strconv"
 
 	"github.com/danielgtaylor/huma/v2"
 
-	"github.com/TTWShell/zodiac-core/requestctx"
 	"github.com/TTWShell/zodiac-core/response"
 )
 
 // DefaultConfig creates an API-local configuration without response rewriting.
 // Customize the returned configuration before constructing the API.
+// Install NewError and NewErrorWithContext at startup for Zodiac framework errors.
 func DefaultConfig(title, version string) huma.Config {
 	cfg := huma.DefaultConfig(title, version)
 	// Keep the Zodiac envelope free of Huma's additional $schema property.
@@ -66,46 +64,13 @@ func Register[I, T any](api huma.API, op huma.Operation, handler func(context.Co
 
 // RegisterOutput preserves Huma's native output contract, including headers,
 // status, raw bytes, streams and no-body responses. It never wraps the Body.
-// Both registration functions preserve public errors and hide unknown failures.
+// Both registration functions normalize public errors and hide unknown failures.
 func RegisterOutput[I, O any](api huma.API, op huma.Operation, handler func(context.Context, *I) (*O, error)) {
-	defineErrors(api, &op)
 	huma.Register(api, op, func(ctx context.Context, in *I) (*O, error) {
 		out, err := handler(ctx, in)
 		if err != nil {
-			var public huma.StatusError
-			if !errors.As(err, &public) {
-				requestctx.Logger(ctx).ErrorContext(ctx, "Unhandled error", "error", err)
-				return nil, response.NewError(http.StatusInternalServerError, "")
-			}
+			return nil, normalizeError(ctx, err)
 		}
 		return out, err
 	})
-}
-
-// Declare both supported error representations from their Go types. Huma's
-// Errors shorthand otherwise replaces declarations using its global factory.
-// Explicit caller-supplied responses take precedence and are not mutated.
-func defineErrors(api huma.API, op *huma.Operation) {
-	op.Responses = maps.Clone(op.Responses)
-	if op.Responses == nil {
-		op.Responses = make(map[string]*huma.Response)
-	}
-	registry := api.OpenAPI().Components.Schemas
-	add := func(status, description string) {
-		if op.Responses[status] != nil {
-			return
-		}
-		op.Responses[status] = &huma.Response{
-			Description: description,
-			Content: map[string]*huma.MediaType{
-				"application/json":         {Schema: registry.Schema(reflect.TypeFor[Body[any]](), true, "")},
-				"application/problem+json": {Schema: registry.Schema(reflect.TypeFor[huma.ErrorModel](), true, "")},
-			},
-		}
-	}
-	for _, status := range op.Errors {
-		add(strconv.Itoa(status), http.StatusText(status))
-	}
-	add("default", "Error")
-	op.Errors = nil
 }

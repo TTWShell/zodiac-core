@@ -58,6 +58,8 @@ type GetTicketInput struct {
 }
 
 func NewHandler(logger *slog.Logger) http.Handler {
+    huma.NewError = humatransport.NewError
+    huma.NewErrorWithContext = humatransport.NewErrorWithContext
     router := chi.NewRouter()
     router.Use(httptransport.Middleware(httptransport.Options{
         Logger: logger, ServiceName: "myapp",
@@ -84,6 +86,10 @@ Run `go mod tidy` after adding the file. In your server's constructor, use
 `httpapi.NewHandler(logger)` as its `Handler`. Import `internal/httpapi` using
 your application's module path. Keep your server's existing listener, timeouts,
 and shutdown handling.
+
+To use Zodiac error responses, assign both error factories once at startup,
+before creating APIs or serving requests. They apply to all Huma APIs in the
+process. Generated projects include this setup.
 
 Once that server is running, request `/tickets/1` for the sample ticket and
 `/tickets/2` for a public 404. Interactive API documentation is served at `/docs`.

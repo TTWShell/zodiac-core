@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - Generated services place the command in `cmd/<name>` and compose feature Fx modules from `internal/app`. HTTP setup lives in `internal/httpserver`.
+- Huma errors use the `code`/`data`/`message` envelope, with client error details in `data.errors`. Generated services install the error factories at startup; existing applications must install `humatransport.NewError` and `humatransport.NewErrorWithContext` to use this format. Error documentation follows Huma's native `Errors` and `Responses` rules.
 
 ## [0.1.0] - 2026-11-26
 

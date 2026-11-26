@@ -145,8 +145,13 @@ HTTP 404:
 {"code":404,"data":null,"message":"Ticket not found"}
 ```
 
-Request `/tickets/0` to receive Huma's HTTP 422 validation response. Visit
-<http://127.0.0.1:8080/docs> to see and call the new operation.
+Request `/tickets/0` to receive HTTP 422:
+
+```json
+{"code":422,"data":{"errors":[{"message":"expected number >= 1","location":"path.id","value":0}]},"message":"validation failed"}
+```
+
+Visit <http://127.0.0.1:8080/docs> to see and call the new operation.
 
 The successful request also emits a `Ticket retrieved` log with `ticket_id` and
 `request_id`. Compare the latter with the response's `X-Request-ID` header.
@@ -168,8 +173,14 @@ Creation responses use business code `201` and message `Created`. Other successf
 
 Business error codes default to the HTTP status. Set the returned error's `Code`
 and `Data` fields if clients need an application-specific code or public details.
-Huma errors keep their explicit messages and validation response format. Unexpected
-errors are logged and return a generic HTTP 500 response.
+Huma errors use the same envelope and retain their HTTP status and explicit
+message. Client error details appear in `data.errors`; without details, `data`
+is null. For 5xx errors, causes are logged instead of included in the response.
+Unexpected handler errors return a generic HTTP 500 response.
+
+Declare error statuses in the operation's `Errors` field. Use `Responses` for
+custom response documentation; an entry in `Errors` overrides `Responses` for
+the same status.
 
 To combine a header with a Zodiac envelope using `RegisterOutput`, declare:
 
