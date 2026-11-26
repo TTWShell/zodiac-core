@@ -20,17 +20,20 @@ Tests and service checks run on Go 1.26.0 and the latest patches of Go 1.26 and
 ```sh
 python3 -m venv .venv-docs
 .venv-docs/bin/python -m pip install -r docs/requirements.txt
-.venv-docs/bin/mkdocs serve
+make docs-serve
 ```
 
 Open the address printed by MkDocs. Validate documentation before submitting:
 
 ```sh
-.venv-docs/bin/mkdocs build --strict
+make docs-build
 ```
 
 Write documentation in English for library users. Keep examples consistent with
 the public API and update the relevant guide when behavior changes.
+
+Edit the root `CHANGELOG.md`; the documentation commands copy it to
+`docs/changelog.md` before serving or building the site.
 
 ## Documentation publishing
 

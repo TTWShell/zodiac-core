@@ -25,7 +25,7 @@ jobs:
           cache: pip
           cache-dependency-path: docs/requirements.txt
       - run: python -m pip install -r docs/requirements.txt
-      - run: mkdocs build --strict
+      - run: make docs-build MKDOCS=mkdocs
 
   publish:
     needs: build
@@ -58,6 +58,7 @@ jobs:
           GIT_COMMITTER_NAME: github-actions[bot]
           GIT_COMMITTER_EMAIL: 41898282+github-actions[bot]@users.noreply.github.com
         run: |
+          make docs-sync
           if git show-ref --verify --quiet refs/remotes/origin/gh-pages; then
             git branch gh-pages origin/gh-pages
           fi

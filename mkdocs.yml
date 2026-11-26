@@ -34,4 +34,5 @@ nav:
   - Configure your application: configuration.md
   - Write and correlate logs: logging.md
   - CLI installation and options: cli.md
+  - Changelog: changelog.md
   - API reference: https://pkg.go.dev/github.com/TTWShell/zodiac-core
