@@ -3,6 +3,7 @@ module github.com/TTWShell/zodiac-core
 go 1.26.0
 
 require (
+	github.com/coder/websocket v1.8.15
 	github.com/danielgtaylor/huma/v2 v2.40.0
 	github.com/felixge/httpsnoop v1.1.0
 	github.com/go-chi/chi/v5 v5.5.0

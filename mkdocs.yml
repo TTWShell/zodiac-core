@@ -30,6 +30,7 @@ nav:
   - Overview: index.md
   - Create a service: getting-started.md
   - Add a business endpoint: http.md
+  - Add a WebSocket endpoint: websockets.md
   - Existing applications: existing-application.md
   - Configure your application: configuration.md
   - Write and correlate logs: logging.md
