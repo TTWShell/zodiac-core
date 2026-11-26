@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"encoding/xml"
 	"errors"
 	"fmt"
 	"io"
@@ -275,15 +276,6 @@ func TestPayloadTypesAndExplicitOutputs(t *testing.T) {
 	humatransport.RegisterOutput(api, op("/explicit"), func(context.Context, *struct{}) (*explicit, error) {
 		return &explicit{Tag: "revision-1", Body: humatransport.Body[inlinePayload]{Code: 42, Data: inlinePayload{Name: "explicit"}, Message: "Custom"}}, nil
 	})
-	humatransport.RegisterOutput(api, op("/raw"), func(context.Context, *struct{}) (*struct {
-		ContentType string `header:"Content-Type"`
-		Body        []byte
-	}, error) {
-		return &struct {
-			ContentType string `header:"Content-Type"`
-			Body        []byte
-		}{"text/plain", []byte("raw")}, nil
-	})
 	humatransport.RegisterOutput(api, op("/stream"), func(context.Context, *struct{}) (*struct{ Body func(huma.Context) }, error) {
 		return &struct{ Body func(huma.Context) }{func(ctx huma.Context) {
 			ctx.SetHeader("Content-Type", "text/event-stream")
@@ -307,7 +299,7 @@ func TestPayloadTypesAndExplicitOutputs(t *testing.T) {
 		{"/scalar", 200, `{"code":0,"data":"hello","message":"Success"}`},
 		{"/null", 200, `{"code":0,"data":null,"message":"Success"}`},
 		{"/explicit", 200, `{"code":42,"data":{"name":"explicit"},"message":"Custom"}`},
-		{"/raw", 200, "raw"}, {"/stream", 200, "data: test"}, {"/empty", 204, ""},
+		{"/stream", 200, "data: test"}, {"/empty", 204, ""},
 		{"/failure", 500, `{"code":500,"data":null,"message":"Internal Server Error"}`},
 	} {
 		w := request(router, "GET", tc.path)
@@ -332,5 +324,101 @@ func TestPayloadTypesAndExplicitOutputs(t *testing.T) {
 	}
 	if len(api.OpenAPI().Paths["/empty"].Get.Responses["204"].Content) != 0 {
 		t.Fatal("204 has body schema")
+	}
+}
+
+type rawOutput struct {
+	ContentType string `header:"Content-Type"`
+	Body        []byte
+}
+
+func TestRawResponseFormats(t *testing.T) {
+	for _, tc := range []struct {
+		name, contentType, body string
+	}{
+		{"xml", "application/xml", `<document><name>Ada &amp; Lin</name></document>`},
+		{"html", "text/html", "<p>Hello</p>"},
+		{"csv", "text/csv", "id,name\n1,Ada\n"},
+		{"text", "text/plain", "hello\n"},
+		{"binary", "application/octet-stream", "\x00\x01\xfe\xff"},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			router, api := newAPI(t, io.Discard)
+			humatransport.RegisterOutput(api, huma.Operation{
+				OperationID: "download", Method: http.MethodGet, Path: "/download",
+				Responses: map[string]*huma.Response{
+					"200": {Description: "Download", Content: map[string]*huma.MediaType{
+						tc.contentType: {Schema: &huma.Schema{Type: "string"}},
+					}},
+				},
+			}, func(context.Context, *struct{}) (*rawOutput, error) {
+				return &rawOutput{ContentType: tc.contentType, Body: []byte(tc.body)}, nil
+			})
+			r := httptest.NewRequest(http.MethodGet, "/download", nil)
+			r.Header.Set("Accept", "application/json")
+			w := httptest.NewRecorder()
+			router.ServeHTTP(w, r)
+			if w.Code != 200 || w.Header().Get("Content-Type") != tc.contentType || w.Body.String() != tc.body {
+				t.Fatalf("response: %d %v %q", w.Code, w.Header(), w.Body.Bytes())
+			}
+			content := api.OpenAPI().Paths["/download"].Get.Responses["200"].Content
+			if len(content) != 1 || content[tc.contentType] == nil {
+				t.Fatalf("unexpected response media types: %v", content)
+			}
+		})
+	}
+}
+
+func TestXMLRequestAndResponse(t *testing.T) {
+	router, api := newAPI(t, io.Discard)
+	type document struct {
+		XMLName xml.Name `xml:"document"`
+		Name    string   `xml:"name"`
+	}
+	type xmlInput struct {
+		RawBody []byte `contentType:"application/xml"`
+	}
+	humatransport.RegisterOutput(api, huma.Operation{
+		OperationID: "echo-xml", Method: http.MethodPost, Path: "/xml",
+		Responses: map[string]*huma.Response{
+			"200": {Description: "XML document", Content: map[string]*huma.MediaType{
+				"application/xml": {Schema: &huma.Schema{Type: "string"}},
+			}},
+		},
+	}, func(_ context.Context, in *xmlInput) (*rawOutput, error) {
+		var value document
+		if err := xml.Unmarshal(in.RawBody, &value); err != nil {
+			return nil, response.NewError(http.StatusBadRequest, "invalid XML")
+		}
+		body, err := xml.Marshal(value)
+		if err != nil {
+			return nil, err
+		}
+		return &rawOutput{ContentType: "application/xml", Body: body}, nil
+	})
+	requestContent := api.OpenAPI().Paths["/xml"].Post.RequestBody.Content
+	responseContent := api.OpenAPI().Paths["/xml"].Post.Responses["200"].Content
+	if len(requestContent) != 1 || requestContent["application/xml"] == nil || requestContent["application/xml"].Schema.Format != "binary" {
+		t.Fatalf("request media types: %v", requestContent)
+	}
+	if len(responseContent) != 1 || responseContent["application/xml"] == nil {
+		t.Fatalf("response media types: %v", responseContent)
+	}
+	for _, tc := range []struct {
+		name, input, contentType, body string
+		status                         int
+	}{
+		{"valid", `<document><name>Ada &amp; Lin</name></document>`, "application/xml", `<document><name>Ada &amp; Lin</name></document>`, 200},
+		{"malformed", "<document>", "application/json", `{"code":400,"data":null,"message":"invalid XML"}`, 400},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			r := httptest.NewRequest(http.MethodPost, "/xml", strings.NewReader(tc.input))
+			r.Header.Set("Content-Type", "application/xml")
+			w := httptest.NewRecorder()
+			router.ServeHTTP(w, r)
+			if w.Code != tc.status || w.Header().Get("Content-Type") != tc.contentType || strings.TrimSpace(w.Body.String()) != tc.body {
+				t.Fatalf("response: %d %v %s", w.Code, w.Header(), w.Body)
+			}
+		})
 	}
 }

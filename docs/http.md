@@ -197,3 +197,93 @@ from its handler, where `ticket` is a `Ticket` value. See
 and empty responses, and the
 [registration API reference](https://pkg.go.dev/github.com/TTWShell/zodiac-core/transport/huma)
 for complete signatures.
+
+## Return XML or other formats
+
+Use `RegisterOutput` with a `Content-Type` header and a `[]byte` body to send XML,
+HTML, CSV, or binary data. The bytes are sent as-is, without a JSON envelope.
+
+To add an XML export to the ticket example, import `encoding/xml` in
+`internal/tickets/tickets.go` and add these types:
+
+```go
+type ticketXML struct {
+    XMLName xml.Name `xml:"ticket"`
+    ID      int      `xml:"id"`
+    Title   string   `xml:"title"`
+    Team    string   `xml:"team"`
+}
+
+type xmlOutput struct {
+    ContentType string `header:"Content-Type"`
+    Body        []byte
+}
+```
+
+Add this registration inside the existing `Register` function:
+
+```go
+humatransport.RegisterOutput(api, huma.Operation{
+    OperationID: "export-ticket-xml",
+    Method:      http.MethodGet,
+    Path:        "/tickets/{id}/xml",
+    Errors:      []int{http.StatusNotFound},
+    Responses: map[string]*huma.Response{
+        "200": {
+            Description: "Ticket as XML",
+            Content: map[string]*huma.MediaType{
+                "application/xml": {Schema: &huma.Schema{Type: "string"}},
+            },
+        },
+    },
+}, func(ctx context.Context, input *GetInput) (*xmlOutput, error) {
+    ticket, err := service.Get(ctx, input.ID)
+    if err != nil {
+        return nil, err
+    }
+    body, err := xml.Marshal(ticketXML{
+        ID: ticket.ID, Title: ticket.Title, Team: ticket.Team,
+    })
+    if err != nil {
+        return nil, err
+    }
+    return &xmlOutput{ContentType: "application/xml", Body: body}, nil
+})
+```
+
+Restart the service and request the export:
+
+```sh
+curl -i http://127.0.0.1:8080/tickets/1/xml
+```
+
+The response has HTTP 200 and `Content-Type: application/xml`:
+
+```xml
+<ticket><id>1</id><title>Cannot sign in</title><team>priority</team></ticket>
+```
+
+The handler selects the format by writing those bytes. Sending
+`Accept: application/xml` to the JSON ticket endpoint does not change its
+response. With the default API configuration, a missing ticket or invalid ID
+still returns the Zodiac JSON error envelope.
+
+For other formats, use the same output shape with the corresponding bytes and
+content type, such as `text/html`, `text/csv`, or `application/octet-stream`.
+Declare that media type in `Responses` so OpenAPI describes the response clients
+actually receive.
+
+If an endpoint also accepts XML, name that media type on the raw body and decode
+it in the handler:
+
+```go
+type xmlInput struct {
+    RawBody []byte `contentType:"application/xml"`
+}
+```
+
+Decode `RawBody` with `xml.Unmarshal` and validate the result in the handler.
+Huma does not validate that XML. Return
+`response.NewError(http.StatusBadRequest, "invalid XML")` for malformed XML.
+Without the `contentType` tag, OpenAPI describes the request as
+`application/octet-stream`.
