@@ -671,13 +671,13 @@ rejects existing files and symbolic-link destinations.</p>
 <p>Run <code>go mod tidy</code> inside the generated project to download its dependencies.</p>
 <h2 id="run-the-generated-applications-commands">Run the generated application's commands</h2>
 <p>From the application's directory:</p>
-<div class="highlight"><pre><span></span><code><span class="nv">APPLICATION_ENVIRONMENT</span><span class="o">=</span>develop<span class="w"> </span>go<span class="w"> </span>run<span class="w"> </span>.<span class="w"> </span>serve<span class="w"> </span>--config-dir<span class="w"> </span>./config
+<div class="highlight"><pre><span></span><code><span class="nv">APPLICATION_ENVIRONMENT</span><span class="o">=</span>develop<span class="w"> </span>go<span class="w"> </span>run<span class="w"> </span>./cmd/myapp<span class="w"> </span>serve<span class="w"> </span>--config-dir<span class="w"> </span>./config
 </code></pre></div>
 <p><code>--config-dir</code> defaults to <code>config</code>, relative to the current working directory.
 For the <code>myapp</code> project, <code>MYAPP_HTTP_ADDR</code> overrides the listener address.
 Other project names use an uppercase prefix with hyphens replaced by underscores.</p>
-<p>Add new application commands in <code>cmd/</code>, following the existing <code>serve.go</code> pattern.
-Use <code>zodiac --help</code> for generator commands and <code>go run . --help</code> for application
+<p>Add new application commands in <code>cmd/myapp/</code>, following the existing <code>serve.go</code> pattern.
+Use <code>zodiac --help</code> for generator commands and <code>go run ./cmd/myapp --help</code> for application
 commands.</p>
 
 

@@ -685,7 +685,7 @@ in the <code>request_id</code> field. The ticket event and access log share the 
 Access logs include the method, path, HTTP status, and duration in milliseconds.</p>
 <p>Logs are written as JSON to stderr.</p>
 <h2 id="change-the-log-level">Change the log level</h2>
-<p>In a generated application's <code>main.go</code>, select the minimum severity when creating
+<p>In a generated application's <code>cmd/myapp/main.go</code>, select the minimum severity when creating
 the logger:</p>
 <div class="highlight"><pre><span></span><code><span class="nx">logger</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">logging</span><span class="p">.</span><span class="nx">New</span><span class="p">(</span><span class="s">"myapp"</span><span class="p">,</span><span class="w"> </span><span class="nx">slog</span><span class="p">.</span><span class="nx">LevelDebug</span><span class="p">)</span>
 </code></pre></div>

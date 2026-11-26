@@ -691,7 +691,7 @@
 for values that vary between deployments. This guide uses the <code>myapp</code> project
 from <a href="../getting-started/">Create a service</a>.</p>
 <h2 id="select-an-environment">Select an environment</h2>
-<div class="highlight"><pre><span></span><code><span class="nv">APPLICATION_ENVIRONMENT</span><span class="o">=</span>develop<span class="w"> </span>go<span class="w"> </span>run<span class="w"> </span>.<span class="w"> </span>serve<span class="w"> </span>--config-dir<span class="w"> </span>./config
+<div class="highlight"><pre><span></span><code><span class="nv">APPLICATION_ENVIRONMENT</span><span class="o">=</span>develop<span class="w"> </span>go<span class="w"> </span>run<span class="w"> </span>./cmd/myapp<span class="w"> </span>serve<span class="w"> </span>--config-dir<span class="w"> </span>./config
 </code></pre></div>
 <p>This loads shared files such as <code>config/app.yaml</code>, then matching overrides such
 as <code>config/app.develop.yaml</code>. When <code>APPLICATION_ENVIRONMENT</code> is unset or empty,
@@ -729,7 +729,7 @@ Append this setting to <code>config/app.yaml</code>, keeping the existing <code>
 <span class="p">},</span>
 </code></pre></div>
 <p>Restart with an override:</p>
-<div class="highlight"><pre><span></span><code><span class="nv">APPLICATION_ENVIRONMENT</span><span class="o">=</span>develop<span class="w"> </span><span class="nv">MYAPP_SUPPORT_TEAM</span><span class="o">=</span>priority<span class="w"> </span>go<span class="w"> </span>run<span class="w"> </span>.<span class="w"> </span>serve
+<div class="highlight"><pre><span></span><code><span class="nv">APPLICATION_ENVIRONMENT</span><span class="o">=</span>develop<span class="w"> </span><span class="nv">MYAPP_SUPPORT_TEAM</span><span class="o">=</span>priority<span class="w"> </span>go<span class="w"> </span>run<span class="w"> </span>./cmd/myapp<span class="w"> </span>serve
 </code></pre></div>
 <p>The effective team is now <code>priority</code>. An unbound environment variable does not
 change configuration; an empty binding value falls back to the file value.</p>

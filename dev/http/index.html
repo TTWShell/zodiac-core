@@ -712,19 +712,36 @@ contains one read-only sample ticket so you can try the API without a database.<
 <p>The handler returns business data. <code>Register</code> supplies the response envelope and
 exposes the input and output types in OpenAPI.</p>
 <h2 id="connect-the-service-to-your-application">Connect the service to your application</h2>
+<p>Create <code>internal/tickets/module.go</code>:</p>
+<div class="highlight"><pre><span></span><code><span class="kn">package</span><span class="w"> </span><span class="nx">tickets</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="p">(</span>
+<span class="w">    </span><span class="s">"log/slog"</span>
+
+<span class="w">    </span><span class="s">"go.uber.org/fx"</span>
+
+<span class="w">    </span><span class="s">"example.com/myapp/internal/config"</span>
+<span class="p">)</span>
+
+<span class="kd">func</span><span class="w"> </span><span class="nx">newService</span><span class="p">(</span><span class="nx">cfg</span><span class="w"> </span><span class="o">*</span><span class="nx">config</span><span class="p">.</span><span class="nx">Config</span><span class="p">,</span><span class="w"> </span><span class="nx">logger</span><span class="w"> </span><span class="o">*</span><span class="nx">slog</span><span class="p">.</span><span class="nx">Logger</span><span class="p">)</span><span class="w"> </span><span class="o">*</span><span class="nx">Service</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="nx">NewService</span><span class="p">(</span><span class="nx">cfg</span><span class="p">.</span><span class="nx">Support</span><span class="p">.</span><span class="nx">Team</span><span class="p">,</span><span class="w"> </span><span class="nx">logger</span><span class="p">)</span>
+<span class="p">}</span>
+
+<span class="kd">var</span><span class="w"> </span><span class="nx">Module</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">fx</span><span class="p">.</span><span class="nx">Module</span><span class="p">(</span><span class="s">"tickets"</span><span class="p">,</span>
+<span class="w">    </span><span class="nx">fx</span><span class="p">.</span><span class="nx">Provide</span><span class="p">(</span><span class="nx">newService</span><span class="p">),</span>
+<span class="w">    </span><span class="nx">fx</span><span class="p">.</span><span class="nx">Invoke</span><span class="p">(</span><span class="nx">Register</span><span class="p">),</span>
+<span class="p">)</span>
+</code></pre></div>
 <p>In <code>internal/app/app.go</code>, add this import:</p>
 <div class="highlight"><pre><span></span><code><span class="s">"example.com/myapp/internal/tickets"</span>
 </code></pre></div>
-<p>Add these two options inside the existing <code>fx.New(...)</code> call, keeping its current
+<p>Add <code>tickets.Module</code> inside the existing <code>fx.New(...)</code> call, keeping its current
 options:</p>
-<div class="highlight"><pre><span></span><code><span class="nx">fx</span><span class="p">.</span><span class="nx">Provide</span><span class="p">(</span><span class="kd">func</span><span class="p">(</span><span class="nx">cfg</span><span class="w"> </span><span class="o">*</span><span class="nx">config</span><span class="p">.</span><span class="nx">Config</span><span class="p">,</span><span class="w"> </span><span class="nx">logger</span><span class="w"> </span><span class="o">*</span><span class="nx">slog</span><span class="p">.</span><span class="nx">Logger</span><span class="p">)</span><span class="w"> </span><span class="o">*</span><span class="nx">tickets</span><span class="p">.</span><span class="nx">Service</span><span class="w"> </span><span class="p">{</span>
-<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="nx">tickets</span><span class="p">.</span><span class="nx">NewService</span><span class="p">(</span><span class="nx">cfg</span><span class="p">.</span><span class="nx">Support</span><span class="p">.</span><span class="nx">Team</span><span class="p">,</span><span class="w"> </span><span class="nx">logger</span><span class="p">)</span>
-<span class="p">}),</span>
-<span class="nx">fx</span><span class="p">.</span><span class="nx">Invoke</span><span class="p">(</span><span class="nx">tickets</span><span class="p">.</span><span class="nx">Register</span><span class="p">),</span>
+<div class="highlight"><pre><span></span><code><span class="nx">tickets</span><span class="p">.</span><span class="nx">Module</span><span class="p">,</span>
 </code></pre></div>
 <h2 id="try-the-endpoint">Try the endpoint</h2>
 <p>Start the application from its project directory:</p>
-<div class="highlight"><pre><span></span><code><span class="nv">APPLICATION_ENVIRONMENT</span><span class="o">=</span>develop<span class="w"> </span><span class="nv">MYAPP_SUPPORT_TEAM</span><span class="o">=</span>priority<span class="w"> </span>go<span class="w"> </span>run<span class="w"> </span>.<span class="w"> </span>serve
+<div class="highlight"><pre><span></span><code><span class="nv">APPLICATION_ENVIRONMENT</span><span class="o">=</span>develop<span class="w"> </span><span class="nv">MYAPP_SUPPORT_TEAM</span><span class="o">=</span>priority<span class="w"> </span>go<span class="w"> </span>run<span class="w"> </span>./cmd/myapp<span class="w"> </span>serve
 </code></pre></div>
 <p>Request the sample ticket:</p>
 <div class="highlight"><pre><span></span><code>curl<span class="w"> </span>-i<span class="w"> </span>http://127.0.0.1:8080/tickets/1

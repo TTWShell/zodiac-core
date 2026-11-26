@@ -682,7 +682,7 @@ throughout this tutorial; replace it with your repository's module path in your
 own project, including in the examples' imports.</p>
 <p>The generator creates a new <code>myapp</code> directory. It must be absent or empty.</p>
 <h2 id="start-the-service">Start the service</h2>
-<div class="highlight"><pre><span></span><code><span class="nv">APPLICATION_ENVIRONMENT</span><span class="o">=</span>develop<span class="w"> </span>go<span class="w"> </span>run<span class="w"> </span>.<span class="w"> </span>serve
+<div class="highlight"><pre><span></span><code><span class="nv">APPLICATION_ENVIRONMENT</span><span class="o">=</span>develop<span class="w"> </span>go<span class="w"> </span>run<span class="w"> </span>./cmd/myapp<span class="w"> </span>serve
 </code></pre></div>
 <p>Check it from another terminal:</p>
 <div class="highlight"><pre><span></span><code>curl<span class="w"> </span>-i<span class="w"> </span>http://127.0.0.1:8080/health
@@ -693,12 +693,12 @@ own project, including in the examples' imports.</p>
 <p>Visit <a href="http://127.0.0.1:8080/docs">http://127.0.0.1:8080/docs</a> to try endpoints in your browser. The OpenAPI
 document is available at <code>/openapi.json</code>. Press Ctrl+C to stop the service.</p>
 <p>If port 8080 is occupied, choose another address:</p>
-<div class="highlight"><pre><span></span><code><span class="nv">APPLICATION_ENVIRONMENT</span><span class="o">=</span>develop<span class="w"> </span><span class="nv">MYAPP_HTTP_ADDR</span><span class="o">=</span><span class="m">127</span>.0.0.1:9090<span class="w"> </span>go<span class="w"> </span>run<span class="w"> </span>.<span class="w"> </span>serve
+<div class="highlight"><pre><span></span><code><span class="nv">APPLICATION_ENVIRONMENT</span><span class="o">=</span>develop<span class="w"> </span><span class="nv">MYAPP_HTTP_ADDR</span><span class="o">=</span><span class="m">127</span>.0.0.1:9090<span class="w"> </span>go<span class="w"> </span>run<span class="w"> </span>./cmd/myapp<span class="w"> </span>serve
 </code></pre></div>
 <h2 id="add-your-first-business-endpoint">Add your first business endpoint</h2>
 <p>Follow the <a href="../http/">ticket endpoint tutorial</a> to add a service and route.</p>
 <h2 id="build-an-executable">Build an executable</h2>
-<div class="highlight"><pre><span></span><code>go<span class="w"> </span>build<span class="w"> </span>-o<span class="w"> </span>bin/myapp<span class="w"> </span>.
+<div class="highlight"><pre><span></span><code>go<span class="w"> </span>build<span class="w"> </span>-o<span class="w"> </span>bin/myapp<span class="w"> </span>./cmd/myapp
 <span class="nv">APPLICATION_ENVIRONMENT</span><span class="o">=</span>production<span class="w"> </span>./bin/myapp<span class="w"> </span>serve<span class="w"> </span>--config-dir<span class="w"> </span>./config
 </code></pre></div>
 <p>Ship the configuration directory with the binary, or supply another directory

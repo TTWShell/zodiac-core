@@ -483,6 +483,34 @@
     </span>
   </a>
   
+    <nav class="md-nav" aria-label="Unreleased">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#added" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Added
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#changed" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Changed
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
       
         <li class="md-nav__item">
@@ -498,7 +526,7 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#added" class="md-nav__link">
+  <a href="#added_1" class="md-nav__link">
     <span class="md-ellipsis">
       
         Added
@@ -583,6 +611,34 @@
     </span>
   </a>
   
+    <nav class="md-nav" aria-label="Unreleased">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#added" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Added
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#changed" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Changed
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
       
         <li class="md-nav__item">
@@ -598,7 +654,7 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#added" class="md-nav__link">
+  <a href="#added_1" class="md-nav__link">
     <span class="md-ellipsis">
       
         Added
@@ -635,9 +691,17 @@
 <p>The format is based on <a href="https://keepachangelog.com/en/1.1.0/">Keep a Changelog</a>,
 and this project adheres to <a href="https://semver.org/spec/v2.0.0.html">Semantic Versioning</a>.</p>
 <h2 id="unreleased"><a href="https://github.com/TTWShell/zodiac-core/compare/v0.1.0...HEAD">Unreleased</a></h2>
+<h3 id="added">Added</h3>
+<ul>
+<li>Generated services include an in-memory user module at <code>internal/user</code>, with <code>GET /users</code> and <code>GET /users/{id}</code>.</li>
+</ul>
+<h3 id="changed">Changed</h3>
+<ul>
+<li>Generated services place the command in <code>cmd/&lt;name&gt;</code> and compose feature Fx modules from <code>internal/app</code>. HTTP setup lives in <code>internal/httpserver</code>.</li>
+</ul>
 <h2 id="010-2026-11-26"><a href="https://github.com/TTWShell/zodiac-core/releases/tag/v0.1.0">0.1.0</a> - 2026-11-26</h2>
 <p>Initial release. Requires Go 1.26.0 or newer.</p>
-<h3 id="added">Added</h3>
+<h3 id="added_1">Added</h3>
 <ul>
 <li><code>zodiac new</code> generates standalone services with Cobra commands, Fx dependency injection, chi/Huma APIs, a health endpoint, and graceful shutdown.</li>
 <li>Layered YAML configuration supports environment selection, configurable search paths, explicit environment variable bindings, strict struct decoding, and application validation.</li>
