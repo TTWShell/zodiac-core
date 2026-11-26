@@ -16,7 +16,7 @@
         <link rel="prev" href="../getting-started/">
       
       
-        <link rel="next" href="../existing-application/">
+        <link rel="next" href="../websockets/">
       
       
         
@@ -385,10 +385,48 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#return-xml-or-other-formats" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Return XML or other formats
+      
+    </span>
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
       
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../websockets/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Add a WebSocket endpoint
+  
+
+    
+  </span>
+  
+  
+
+      </a>
     </li>
   
 
@@ -625,6 +663,17 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#return-xml-or-other-formats" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Return XML or other formats
+      
+    </span>
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -817,6 +866,76 @@ from its handler, where <code>ticket</code> is a <code>Ticket</code> value. See
 and empty responses, and the
 <a href="https://pkg.go.dev/github.com/TTWShell/zodiac-core/transport/huma">registration API reference</a>
 for complete signatures.</p>
+<h2 id="return-xml-or-other-formats">Return XML or other formats</h2>
+<p>Use <code>RegisterOutput</code> with a <code>Content-Type</code> header and a <code>[]byte</code> body to send XML,
+HTML, CSV, or binary data. The bytes are sent as-is, without a JSON envelope.</p>
+<p>To add an XML export to the ticket example, import <code>encoding/xml</code> in
+<code>internal/tickets/tickets.go</code> and add these types:</p>
+<div class="highlight"><pre><span></span><code><span class="kd">type</span><span class="w"> </span><span class="nx">ticketXML</span><span class="w"> </span><span class="kd">struct</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nx">XMLName</span><span class="w"> </span><span class="nx">xml</span><span class="p">.</span><span class="nx">Name</span><span class="w"> </span><span class="s">`xml:"ticket"`</span>
+<span class="w">    </span><span class="nx">ID</span><span class="w">      </span><span class="kt">int</span><span class="w">      </span><span class="s">`xml:"id"`</span>
+<span class="w">    </span><span class="nx">Title</span><span class="w">   </span><span class="kt">string</span><span class="w">   </span><span class="s">`xml:"title"`</span>
+<span class="w">    </span><span class="nx">Team</span><span class="w">    </span><span class="kt">string</span><span class="w">   </span><span class="s">`xml:"team"`</span>
+<span class="p">}</span>
+
+<span class="kd">type</span><span class="w"> </span><span class="nx">xmlOutput</span><span class="w"> </span><span class="kd">struct</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nx">ContentType</span><span class="w"> </span><span class="kt">string</span><span class="w"> </span><span class="s">`header:"Content-Type"`</span>
+<span class="w">    </span><span class="nx">Body</span><span class="w">        </span><span class="p">[]</span><span class="kt">byte</span>
+<span class="p">}</span>
+</code></pre></div>
+<p>Add this registration inside the existing <code>Register</code> function:</p>
+<div class="highlight"><pre><span></span><code><span class="nx">humatransport</span><span class="p">.</span><span class="nx">RegisterOutput</span><span class="p">(</span><span class="nx">api</span><span class="p">,</span><span class="w"> </span><span class="nx">huma</span><span class="p">.</span><span class="nx">Operation</span><span class="p">{</span>
+<span class="w">    </span><span class="nx">OperationID</span><span class="p">:</span><span class="w"> </span><span class="s">"export-ticket-xml"</span><span class="p">,</span>
+<span class="w">    </span><span class="nx">Method</span><span class="p">:</span><span class="w">      </span><span class="nx">http</span><span class="p">.</span><span class="nx">MethodGet</span><span class="p">,</span>
+<span class="w">    </span><span class="nx">Path</span><span class="p">:</span><span class="w">        </span><span class="s">"/tickets/{id}/xml"</span><span class="p">,</span>
+<span class="w">    </span><span class="nx">Errors</span><span class="p">:</span><span class="w">      </span><span class="p">[]</span><span class="kt">int</span><span class="p">{</span><span class="nx">http</span><span class="p">.</span><span class="nx">StatusNotFound</span><span class="p">},</span>
+<span class="w">    </span><span class="nx">Responses</span><span class="p">:</span><span class="w"> </span><span class="kt">map</span><span class="p">[</span><span class="kt">string</span><span class="p">]</span><span class="o">*</span><span class="nx">huma</span><span class="p">.</span><span class="nx">Response</span><span class="p">{</span>
+<span class="w">        </span><span class="s">"200"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="nx">Description</span><span class="p">:</span><span class="w"> </span><span class="s">"Ticket as XML"</span><span class="p">,</span>
+<span class="w">            </span><span class="nx">Content</span><span class="p">:</span><span class="w"> </span><span class="kt">map</span><span class="p">[</span><span class="kt">string</span><span class="p">]</span><span class="o">*</span><span class="nx">huma</span><span class="p">.</span><span class="nx">MediaType</span><span class="p">{</span>
+<span class="w">                </span><span class="s">"application/xml"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="nx">Schema</span><span class="p">:</span><span class="w"> </span><span class="o">&amp;</span><span class="nx">huma</span><span class="p">.</span><span class="nx">Schema</span><span class="p">{</span><span class="nx">Type</span><span class="p">:</span><span class="w"> </span><span class="s">"string"</span><span class="p">}},</span>
+<span class="w">            </span><span class="p">},</span>
+<span class="w">        </span><span class="p">},</span>
+<span class="w">    </span><span class="p">},</span>
+<span class="p">},</span><span class="w"> </span><span class="kd">func</span><span class="p">(</span><span class="nx">ctx</span><span class="w"> </span><span class="nx">context</span><span class="p">.</span><span class="nx">Context</span><span class="p">,</span><span class="w"> </span><span class="nx">input</span><span class="w"> </span><span class="o">*</span><span class="nx">GetInput</span><span class="p">)</span><span class="w"> </span><span class="p">(</span><span class="o">*</span><span class="nx">xmlOutput</span><span class="p">,</span><span class="w"> </span><span class="kt">error</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nx">ticket</span><span class="p">,</span><span class="w"> </span><span class="nx">err</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">service</span><span class="p">.</span><span class="nx">Get</span><span class="p">(</span><span class="nx">ctx</span><span class="p">,</span><span class="w"> </span><span class="nx">input</span><span class="p">.</span><span class="nx">ID</span><span class="p">)</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="nx">err</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="kc">nil</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="kc">nil</span><span class="p">,</span><span class="w"> </span><span class="nx">err</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="w">    </span><span class="nx">body</span><span class="p">,</span><span class="w"> </span><span class="nx">err</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">xml</span><span class="p">.</span><span class="nx">Marshal</span><span class="p">(</span><span class="nx">ticketXML</span><span class="p">{</span>
+<span class="w">        </span><span class="nx">ID</span><span class="p">:</span><span class="w"> </span><span class="nx">ticket</span><span class="p">.</span><span class="nx">ID</span><span class="p">,</span><span class="w"> </span><span class="nx">Title</span><span class="p">:</span><span class="w"> </span><span class="nx">ticket</span><span class="p">.</span><span class="nx">Title</span><span class="p">,</span><span class="w"> </span><span class="nx">Team</span><span class="p">:</span><span class="w"> </span><span class="nx">ticket</span><span class="p">.</span><span class="nx">Team</span><span class="p">,</span>
+<span class="w">    </span><span class="p">})</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="nx">err</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="kc">nil</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="kc">nil</span><span class="p">,</span><span class="w"> </span><span class="nx">err</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="o">&amp;</span><span class="nx">xmlOutput</span><span class="p">{</span><span class="nx">ContentType</span><span class="p">:</span><span class="w"> </span><span class="s">"application/xml"</span><span class="p">,</span><span class="w"> </span><span class="nx">Body</span><span class="p">:</span><span class="w"> </span><span class="nx">body</span><span class="p">},</span><span class="w"> </span><span class="kc">nil</span>
+<span class="p">})</span>
+</code></pre></div>
+<p>Restart the service and request the export:</p>
+<div class="highlight"><pre><span></span><code>curl<span class="w"> </span>-i<span class="w"> </span>http://127.0.0.1:8080/tickets/1/xml
+</code></pre></div>
+<p>The response has HTTP 200 and <code>Content-Type: application/xml</code>:</p>
+<div class="highlight"><pre><span></span><code><span class="nt">&lt;ticket&gt;&lt;id&gt;</span>1<span class="nt">&lt;/id&gt;&lt;title&gt;</span>Cannot<span class="w"> </span>sign<span class="w"> </span>in<span class="nt">&lt;/title&gt;&lt;team&gt;</span>priority<span class="nt">&lt;/team&gt;&lt;/ticket&gt;</span>
+</code></pre></div>
+<p>The handler selects the format by writing those bytes. Sending
+<code>Accept: application/xml</code> to the JSON ticket endpoint does not change its
+response. With the default API configuration, a missing ticket or invalid ID
+still returns the Zodiac JSON error envelope.</p>
+<p>For other formats, use the same output shape with the corresponding bytes and
+content type, such as <code>text/html</code>, <code>text/csv</code>, or <code>application/octet-stream</code>.
+Declare that media type in <code>Responses</code> so OpenAPI describes the response clients
+actually receive.</p>
+<p>If an endpoint also accepts XML, name that media type on the raw body and decode
+it in the handler:</p>
+<div class="highlight"><pre><span></span><code><span class="kd">type</span><span class="w"> </span><span class="nx">xmlInput</span><span class="w"> </span><span class="kd">struct</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nx">RawBody</span><span class="w"> </span><span class="p">[]</span><span class="kt">byte</span><span class="w"> </span><span class="s">`contentType:"application/xml"`</span>
+<span class="p">}</span>
+</code></pre></div>
+<p>Decode <code>RawBody</code> with <code>xml.Unmarshal</code> and validate the result in the handler.
+Huma does not validate that XML. Return
+<code>response.NewError(http.StatusBadRequest, "invalid XML")</code> for malformed XML.
+Without the <code>contentType</code> tag, OpenAPI describes the request as
+<code>application/octet-stream</code>.</p>
 
 
 
