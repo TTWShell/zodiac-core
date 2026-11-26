@@ -119,7 +119,7 @@ func render(opts Options) ([]entry, error) {
 		if path == "templates" {
 			return nil
 		}
-		rel := strings.TrimPrefix(path, "templates/")
+		rel := outputPath(strings.TrimPrefix(path, "templates/"), opts.Name)
 		if item.IsDir() {
 			entries = append(entries, entry{path: rel, isDir: true})
 			return nil
@@ -156,6 +156,18 @@ func render(opts Options) ([]entry, error) {
 		return nil, fmt.Errorf("render project: %w", err)
 	}
 	return entries, nil
+}
+
+// cmd/app holds the command templates. The generated binary is package main at cmd/<name>.
+func outputPath(rel, name string) string {
+	const commandDir = "cmd/app"
+	if rel == commandDir {
+		return "cmd/" + name
+	}
+	if strings.HasPrefix(rel, commandDir+"/") {
+		return "cmd/" + name + strings.TrimPrefix(rel, commandDir)
+	}
+	return rel
 }
 
 func writeProject(dir string, entries []entry) (err error) {

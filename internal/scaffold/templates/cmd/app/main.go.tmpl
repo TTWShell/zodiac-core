@@ -5,15 +5,13 @@ import (
 	"os"
 
 	"github.com/TTWShell/zodiac-core/logging"
-
-	"{{.Module}}/cmd"
 )
 
 func main() {
 	logger := logging.New("{{.Name}}", slog.LevelInfo)
 	slog.SetDefault(logger)
 
-	if err := cmd.Execute(); err != nil {
+	if err := Execute(); err != nil {
 		logger.Error("Command failed", "error", err)
 		os.Exit(1)
 	}

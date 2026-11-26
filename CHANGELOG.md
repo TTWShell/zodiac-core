@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Generated services include an in-memory user module at `internal/user`, with `GET /users` and `GET /users/{id}`.
+
+### Changed
+
+- Generated services place the command in `cmd/<name>` and compose feature Fx modules from `internal/app`. HTTP setup lives in `internal/httpserver`.
+
 ## [0.1.0] - 2026-11-26
 
 Initial release. Requires Go 1.26.0 or newer.

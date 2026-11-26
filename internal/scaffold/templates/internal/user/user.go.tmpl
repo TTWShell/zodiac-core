@@ -1,0 +1,48 @@
+// Package user is the sample business module.
+package user
+
+import (
+	"context"
+	"log/slog"
+	"net/http"
+
+	"github.com/TTWShell/zodiac-core/response"
+)
+
+type User struct {
+	ID   int    `json:"id"`
+	Name string `json:"name"`
+}
+
+type Service struct {
+	logger *slog.Logger
+	users  []User
+}
+
+func NewService(logger *slog.Logger) *Service {
+	return &Service{
+		logger: logger,
+		users: []User{
+			{ID: 1, Name: "Ada"},
+			{ID: 2, Name: "Lin"},
+		},
+	}
+}
+
+func (s *Service) List(context.Context) []User {
+	users := make([]User, len(s.users))
+	copy(users, s.users)
+	return users
+}
+
+func (s *Service) Get(ctx context.Context, id int) (*User, error) {
+	for i := range s.users {
+		if s.users[i].ID != id {
+			continue
+		}
+		s.logger.InfoContext(ctx, "User retrieved", "user_id", id)
+		user := s.users[i]
+		return &user, nil
+	}
+	return nil, response.NewError(http.StatusNotFound, "User not found")
+}

@@ -48,13 +48,13 @@ Run `go mod tidy` inside the generated project to download its dependencies.
 From the application's directory:
 
 ```sh
-APPLICATION_ENVIRONMENT=develop go run . serve --config-dir ./config
+APPLICATION_ENVIRONMENT=develop go run ./cmd/myapp serve --config-dir ./config
 ```
 
 `--config-dir` defaults to `config`, relative to the current working directory.
 For the `myapp` project, `MYAPP_HTTP_ADDR` overrides the listener address.
 Other project names use an uppercase prefix with hyphens replaced by underscores.
 
-Add new application commands in `cmd/`, following the existing `serve.go` pattern.
-Use `zodiac --help` for generator commands and `go run . --help` for application
+Add new application commands in `cmd/myapp/`, following the existing `serve.go` pattern.
+Use `zodiac --help` for generator commands and `go run ./cmd/myapp --help` for application
 commands.

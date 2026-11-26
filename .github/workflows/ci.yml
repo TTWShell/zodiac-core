@@ -65,7 +65,7 @@ jobs:
             --core-path "$PWD" --output "$project"
           cd "$project"
           go mod tidy
-          go build -o service .
+          go build -o service ./cmd/smoke-service
           APPLICATION_ENVIRONMENT=develop SMOKE_SERVICE_HTTP_ADDR=127.0.0.1:18080 \
             ./service serve --config-dir ./config >server.log 2>&1 &
           server_pid=$!
@@ -77,8 +77,10 @@ jobs:
             sleep 0.2
           done
           jq -e '. == {code: 0, data: {status: "ok"}, message: "Success"}' health.json
+          curl --noproxy '*' --silent --fail --max-time 5 http://127.0.0.1:18080/users/1 -o user.json
+          jq -e '. == {code: 0, data: {id: 1, name: "Ada"}, message: "Success"}' user.json
           curl --noproxy '*' --fail --silent --show-error --max-time 5 http://127.0.0.1:18080/openapi.json \
-            | jq -e '.paths["/health"].get.operationId == "get-health"'
+            | jq -e '.paths["/health"].get.operationId == "get-health" and .paths["/users/{id}"].get.operationId == "get-user"'
           kill -TERM "$server_pid"
           wait "$server_pid"
           server_pid=""

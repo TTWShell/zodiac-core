@@ -17,7 +17,7 @@ func TestNewCommandDefaultsToProjectName(t *testing.T) {
 	if err := cmd.Execute(); err != nil {
 		t.Fatal(err)
 	}
-	if _, err := os.Stat(filepath.Join("demo-service", "cmd", "serve.go")); err != nil {
+	if _, err := os.Stat(filepath.Join("demo-service", "cmd", "demo-service", "serve.go")); err != nil {
 		t.Fatal(err)
 	}
 	if !strings.Contains(output.String(), "go mod tidy") {

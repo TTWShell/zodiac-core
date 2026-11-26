@@ -30,7 +30,7 @@ The generator creates a new `myapp` directory. It must be absent or empty.
 ## Start the service
 
 ```sh
-APPLICATION_ENVIRONMENT=develop go run . serve
+APPLICATION_ENVIRONMENT=develop go run ./cmd/myapp serve
 ```
 
 Check it from another terminal:
@@ -51,7 +51,7 @@ document is available at `/openapi.json`. Press Ctrl+C to stop the service.
 If port 8080 is occupied, choose another address:
 
 ```sh
-APPLICATION_ENVIRONMENT=develop MYAPP_HTTP_ADDR=127.0.0.1:9090 go run . serve
+APPLICATION_ENVIRONMENT=develop MYAPP_HTTP_ADDR=127.0.0.1:9090 go run ./cmd/myapp serve
 ```
 
 ## Add your first business endpoint
@@ -61,7 +61,7 @@ Follow the [ticket endpoint tutorial](http.md) to add a service and route.
 ## Build an executable
 
 ```sh
-go build -o bin/myapp .
+go build -o bin/myapp ./cmd/myapp
 APPLICATION_ENVIRONMENT=production ./bin/myapp serve --config-dir ./config
 ```
 

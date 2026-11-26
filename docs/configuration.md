@@ -7,7 +7,7 @@ from [Create a service](getting-started.md).
 ## Select an environment
 
 ```sh
-APPLICATION_ENVIRONMENT=develop go run . serve --config-dir ./config
+APPLICATION_ENVIRONMENT=develop go run ./cmd/myapp serve --config-dir ./config
 ```
 
 This loads shared files such as `config/app.yaml`, then matching overrides such
@@ -64,7 +64,7 @@ EnvBindings: map[string]string{
 Restart with an override:
 
 ```sh
-APPLICATION_ENVIRONMENT=develop MYAPP_SUPPORT_TEAM=priority go run . serve
+APPLICATION_ENVIRONMENT=develop MYAPP_SUPPORT_TEAM=priority go run ./cmd/myapp serve
 ```
 
 The effective team is now `priority`. An unbound environment variable does not

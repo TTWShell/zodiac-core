@@ -27,8 +27,8 @@ func newProjectCommand() *cobra.Command {
 				return err
 			}
 			_, err = fmt.Fprintf(cmd.OutOrStdout(),
-				"Created project at %s\n\nNext steps:\n  cd %s\n  go mod tidy\n  APPLICATION_ENVIRONMENT=develop go run . serve --config-dir ./config\n",
-				dir, shellQuote(dir))
+				"Created project at %s\n\nNext steps:\n  cd %s\n  go mod tidy\n  APPLICATION_ENVIRONMENT=develop go run ./cmd/%s serve --config-dir ./config\n",
+				dir, shellQuote(dir), args[0])
 			return err
 		},
 	}

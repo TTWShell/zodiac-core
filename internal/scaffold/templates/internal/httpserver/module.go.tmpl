@@ -1,0 +1,17 @@
+package httpserver
+
+import (
+	"go.uber.org/fx"
+
+	"{{.Module}}/internal/config"
+)
+
+// Module serves HTTP and exposes the Huma API. Feature modules depend on that
+// API; the router and server stay inside this module.
+var Module = fx.Module("httpserver",
+	fx.Provide(newAPI),
+	fx.Provide(fx.Private, httpConfig, newRouter, newHandler, newServer),
+	fx.Invoke(registerServer),
+)
+
+func httpConfig(cfg *config.Config) config.HTTPConfig { return cfg.HTTP }

@@ -1,4 +1,4 @@
-package app
+package httpserver
 
 import (
 	"log/slog"
@@ -29,6 +29,8 @@ func newRouter(logger *slog.Logger) *chi.Mux {
 	})
 	return router
 }
+
+func newHandler(router *chi.Mux) http.Handler { return router }
 
 func newAPI(router *chi.Mux) huma.API {
 	return humachi.New(router, humatransport.DefaultConfig("{{.Name}}", "1.0.0"))

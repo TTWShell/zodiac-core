@@ -1,0 +1,6 @@
+package health
+
+import "go.uber.org/fx"
+
+// Module registers the health endpoint.
+var Module = fx.Module("health", fx.Invoke(Register))

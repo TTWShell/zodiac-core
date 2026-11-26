@@ -19,7 +19,7 @@ go install github.com/TTWShell/zodiac-core/cmd/zodiac@latest
 zodiac new myapp --module example.com/myapp
 cd myapp
 go mod tidy
-APPLICATION_ENVIRONMENT=develop go run . serve --config-dir ./config
+APPLICATION_ENVIRONMENT=develop go run ./cmd/myapp serve --config-dir ./config
 ```
 
 Check the service in another terminal:

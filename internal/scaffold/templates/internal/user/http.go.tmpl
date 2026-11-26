@@ -1,0 +1,34 @@
+package user
+
+import (
+	"context"
+	"net/http"
+
+	"github.com/danielgtaylor/huma/v2"
+
+	humatransport "github.com/TTWShell/zodiac-core/transport/huma"
+)
+
+type GetInput struct {
+	ID int `path:"id" minimum:"1"`
+}
+
+func Register(api huma.API, service *Service) {
+	humatransport.Register(api, huma.Operation{
+		OperationID: "list-users",
+		Method:      http.MethodGet,
+		Path:        "/users",
+		Summary:     "List users",
+	}, func(ctx context.Context, input *struct{}) ([]User, error) {
+		return service.List(ctx), nil
+	})
+	humatransport.Register(api, huma.Operation{
+		OperationID: "get-user",
+		Method:      http.MethodGet,
+		Path:        "/users/{id}",
+		Summary:     "Get a user",
+		Errors:      []int{http.StatusNotFound},
+	}, func(ctx context.Context, input *GetInput) (*User, error) {
+		return service.Get(ctx, input.ID)
+	})
+}

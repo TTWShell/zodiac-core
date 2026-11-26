@@ -34,7 +34,7 @@ Logs are written as JSON to stderr.
 
 ## Change the log level
 
-In a generated application's `main.go`, select the minimum severity when creating
+In a generated application's `cmd/myapp/main.go`, select the minimum severity when creating
 the logger:
 
 ```go

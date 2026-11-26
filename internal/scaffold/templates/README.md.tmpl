@@ -6,7 +6,7 @@ Requires Go 1.26.0 or newer.
 
 ```sh
 go mod tidy
-APPLICATION_ENVIRONMENT=develop go run . serve --config-dir ./config
+APPLICATION_ENVIRONMENT=develop go run ./cmd/{{.Name}} serve --config-dir ./config
 ```
 
 Check the service:
@@ -29,13 +29,13 @@ Use `--config-dir` to specify a different configuration directory. Override the
 HTTP listen address with `{{envPrefix .Name}}_HTTP_ADDR`:
 
 ```sh
-APPLICATION_ENVIRONMENT=develop {{envPrefix .Name}}_HTTP_ADDR=127.0.0.1:9090 go run . serve
+APPLICATION_ENVIRONMENT=develop {{envPrefix .Name}}_HTTP_ADDR=127.0.0.1:9090 go run ./cmd/{{.Name}} serve
 ```
 
 ## Build and run
 
 ```sh
-go build -o bin/{{.Name}} .
+go build -o bin/{{.Name}} ./cmd/{{.Name}}
 APPLICATION_ENVIRONMENT=production ./bin/{{.Name}} serve --config-dir ./config
 ```
 {{if .CorePath}}

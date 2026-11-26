@@ -77,20 +77,40 @@ exposes the input and output types in OpenAPI.
 
 ## Connect the service to your application
 
+Create `internal/tickets/module.go`:
+
+```go
+package tickets
+
+import (
+    "log/slog"
+
+    "go.uber.org/fx"
+
+    "example.com/myapp/internal/config"
+)
+
+func newService(cfg *config.Config, logger *slog.Logger) *Service {
+    return NewService(cfg.Support.Team, logger)
+}
+
+var Module = fx.Module("tickets",
+    fx.Provide(newService),
+    fx.Invoke(Register),
+)
+```
+
 In `internal/app/app.go`, add this import:
 
 ```go
 "example.com/myapp/internal/tickets"
 ```
 
-Add these two options inside the existing `fx.New(...)` call, keeping its current
+Add `tickets.Module` inside the existing `fx.New(...)` call, keeping its current
 options:
 
 ```go
-fx.Provide(func(cfg *config.Config, logger *slog.Logger) *tickets.Service {
-    return tickets.NewService(cfg.Support.Team, logger)
-}),
-fx.Invoke(tickets.Register),
+tickets.Module,
 ```
 
 ## Try the endpoint
@@ -98,7 +118,7 @@ fx.Invoke(tickets.Register),
 Start the application from its project directory:
 
 ```sh
-APPLICATION_ENVIRONMENT=develop MYAPP_SUPPORT_TEAM=priority go run . serve
+APPLICATION_ENVIRONMENT=develop MYAPP_SUPPORT_TEAM=priority go run ./cmd/myapp serve
 ```
 
 Request the sample ticket:
