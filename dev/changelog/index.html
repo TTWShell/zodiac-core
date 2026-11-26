@@ -510,7 +510,18 @@
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Unreleased">
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#020-2026-11-26" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        0.2.0 - 2026-11-26
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="0.2.0 - 2026-11-26">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -529,6 +540,17 @@
     <span class="md-ellipsis">
       
         Changed
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#fixed" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Fixed
       
     </span>
   </a>
@@ -638,7 +660,18 @@
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Unreleased">
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#020-2026-11-26" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        0.2.0 - 2026-11-26
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="0.2.0 - 2026-11-26">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -657,6 +690,17 @@
     <span class="md-ellipsis">
       
         Changed
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#fixed" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Fixed
       
     </span>
   </a>
@@ -717,15 +761,23 @@
 <p>All notable changes to this project are documented in this file.</p>
 <p>The format is based on <a href="https://keepachangelog.com/en/1.1.0/">Keep a Changelog</a>,
 and this project adheres to <a href="https://semver.org/spec/v2.0.0.html">Semantic Versioning</a>.</p>
-<h2 id="unreleased"><a href="https://github.com/TTWShell/zodiac-core/compare/v0.1.0...HEAD">Unreleased</a></h2>
+<h2 id="unreleased"><a href="https://github.com/TTWShell/zodiac-core/compare/v0.2.0...HEAD">Unreleased</a></h2>
+<h2 id="020-2026-11-26"><a href="https://github.com/TTWShell/zodiac-core/compare/v0.1.0...v0.2.0">0.2.0</a> - 2026-11-26</h2>
 <h3 id="added">Added</h3>
 <ul>
 <li>Generated services include an in-memory user module at <code>internal/user</code>, with <code>GET /users</code> and <code>GET /users/{id}</code>.</li>
+<li><code>humatransport.NewError</code> and <code>humatransport.NewErrorWithContext</code> integrate Huma framework errors with Zodiac responses and request logging.</li>
+<li>Usage guides cover XML requests and raw XML, HTML, CSV, text, and binary responses. A WebSocket example demonstrates message handling and shutdown, including upgrades in progress.</li>
 </ul>
 <h3 id="changed">Changed</h3>
 <ul>
-<li>Generated services place the command in <code>cmd/&lt;name&gt;</code> and compose feature Fx modules from <code>internal/app</code>. HTTP setup lives in <code>internal/httpserver</code>.</li>
-<li>Huma errors use the <code>code</code>/<code>data</code>/<code>message</code> envelope, with client error details in <code>data.errors</code>. Generated services install the error factories at startup; existing applications must install <code>humatransport.NewError</code> and <code>humatransport.NewErrorWithContext</code> to use this format. Error documentation follows Huma's native <code>Errors</code> and <code>Responses</code> rules.</li>
+<li>Generated services place the command in <code>cmd/&lt;name&gt;</code> and compose feature Fx modules from <code>internal/app</code>. HTTP setup lives in <code>internal/httpserver</code>; run newly generated services with <code>go run ./cmd/&lt;name&gt; serve</code>.</li>
+<li>Huma errors use the <code>code</code>/<code>data</code>/<code>message</code> envelope, with client error details in <code>data.errors</code>. Generated services install the error factories at startup; existing applications must assign <code>huma.NewError = humatransport.NewError</code> and <code>huma.NewErrorWithContext = humatransport.NewErrorWithContext</code> before creating APIs to apply this format to framework errors. These factories affect all Huma APIs in the process.</li>
+<li>Error documentation follows Huma's native <code>Errors</code> and <code>Responses</code> rules; an entry in <code>Errors</code> overrides <code>Responses</code> for the same status.</li>
+</ul>
+<h3 id="fixed">Fixed</h3>
+<ul>
+<li>Error normalization preserves response headers carried by wrapped errors and logs internal error causes without including those causes in responses.</li>
 </ul>
 <h2 id="010-2026-11-26"><a href="https://github.com/TTWShell/zodiac-core/releases/tag/v0.1.0">0.1.0</a> - 2026-11-26</h2>
 <p>Initial release. Requires Go 1.26.0 or newer.</p>
