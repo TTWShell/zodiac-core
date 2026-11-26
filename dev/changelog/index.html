@@ -698,6 +698,7 @@ and this project adheres to <a href="https://semver.org/spec/v2.0.0.html">Semant
 <h3 id="changed">Changed</h3>
 <ul>
 <li>Generated services place the command in <code>cmd/&lt;name&gt;</code> and compose feature Fx modules from <code>internal/app</code>. HTTP setup lives in <code>internal/httpserver</code>.</li>
+<li>Huma errors use the <code>code</code>/<code>data</code>/<code>message</code> envelope, with client error details in <code>data.errors</code>. Generated services install the error factories at startup; existing applications must install <code>humatransport.NewError</code> and <code>humatransport.NewErrorWithContext</code> to use this format. Error documentation follows Huma's native <code>Errors</code> and <code>Responses</code> rules.</li>
 </ul>
 <h2 id="010-2026-11-26"><a href="https://github.com/TTWShell/zodiac-core/releases/tag/v0.1.0">0.1.0</a> - 2026-11-26</h2>
 <p>Initial release. Requires Go 1.26.0 or newer.</p>

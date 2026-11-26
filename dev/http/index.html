@@ -755,8 +755,10 @@ options:</p>
 <p>HTTP 404:</p>
 <div class="highlight"><pre><span></span><code><span class="p">{</span><span class="nt">"code"</span><span class="p">:</span><span class="mi">404</span><span class="p">,</span><span class="nt">"data"</span><span class="p">:</span><span class="kc">null</span><span class="p">,</span><span class="nt">"message"</span><span class="p">:</span><span class="s2">"Ticket not found"</span><span class="p">}</span>
 </code></pre></div>
-<p>Request <code>/tickets/0</code> to receive Huma's HTTP 422 validation response. Visit
-<a href="http://127.0.0.1:8080/docs">http://127.0.0.1:8080/docs</a> to see and call the new operation.</p>
+<p>Request <code>/tickets/0</code> to receive HTTP 422:</p>
+<div class="highlight"><pre><span></span><code><span class="p">{</span><span class="nt">"code"</span><span class="p">:</span><span class="mi">422</span><span class="p">,</span><span class="nt">"data"</span><span class="p">:{</span><span class="nt">"errors"</span><span class="p">:[{</span><span class="nt">"message"</span><span class="p">:</span><span class="s2">"expected number &gt;= 1"</span><span class="p">,</span><span class="nt">"location"</span><span class="p">:</span><span class="s2">"path.id"</span><span class="p">,</span><span class="nt">"value"</span><span class="p">:</span><span class="mi">0</span><span class="p">}]},</span><span class="nt">"message"</span><span class="p">:</span><span class="s2">"validation failed"</span><span class="p">}</span>
+</code></pre></div>
+<p>Visit <a href="http://127.0.0.1:8080/docs">http://127.0.0.1:8080/docs</a> to see and call the new operation.</p>
 <p>The successful request also emits a <code>Ticket retrieved</code> log with <code>ticket_id</code> and
 <code>request_id</code>. Compare the latter with the response's <code>X-Request-ID</code> header.
 See <a href="../logging/">logging</a> for recording additional business events.</p>
@@ -796,8 +798,13 @@ Creation responses use business code <code>201</code> and message <code>Created<
 <code>Register</code> responses use code <code>0</code> and message <code>Success</code>.</p>
 <p>Business error codes default to the HTTP status. Set the returned error's <code>Code</code>
 and <code>Data</code> fields if clients need an application-specific code or public details.
-Huma errors keep their explicit messages and validation response format. Unexpected
-errors are logged and return a generic HTTP 500 response.</p>
+Huma errors use the same envelope and retain their HTTP status and explicit
+message. Client error details appear in <code>data.errors</code>; without details, <code>data</code>
+is null. For 5xx errors, causes are logged instead of included in the response.
+Unexpected handler errors return a generic HTTP 500 response.</p>
+<p>Declare error statuses in the operation's <code>Errors</code> field. Use <code>Responses</code> for
+custom response documentation; an entry in <code>Errors</code> overrides <code>Responses</code> for
+the same status.</p>
 <p>To combine a header with a Zodiac envelope using <code>RegisterOutput</code>, declare:</p>
 <div class="highlight"><pre><span></span><code><span class="kd">type</span><span class="w"> </span><span class="nx">TicketOutput</span><span class="w"> </span><span class="kd">struct</span><span class="w"> </span><span class="p">{</span>
 <span class="w">    </span><span class="nx">ETag</span><span class="w"> </span><span class="kt">string</span><span class="w"> </span><span class="s">`header:"ETag"`</span>

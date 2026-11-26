@@ -665,6 +665,8 @@ Neither package requires Fx or an HTTP server.</p>
 <span class="p">}</span>
 
 <span class="kd">func</span><span class="w"> </span><span class="nx">NewHandler</span><span class="p">(</span><span class="nx">logger</span><span class="w"> </span><span class="o">*</span><span class="nx">slog</span><span class="p">.</span><span class="nx">Logger</span><span class="p">)</span><span class="w"> </span><span class="nx">http</span><span class="p">.</span><span class="nx">Handler</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nx">huma</span><span class="p">.</span><span class="nx">NewError</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">humatransport</span><span class="p">.</span><span class="nx">NewError</span>
+<span class="w">    </span><span class="nx">huma</span><span class="p">.</span><span class="nx">NewErrorWithContext</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">humatransport</span><span class="p">.</span><span class="nx">NewErrorWithContext</span>
 <span class="w">    </span><span class="nx">router</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">chi</span><span class="p">.</span><span class="nx">NewRouter</span><span class="p">()</span>
 <span class="w">    </span><span class="nx">router</span><span class="p">.</span><span class="nx">Use</span><span class="p">(</span><span class="nx">httptransport</span><span class="p">.</span><span class="nx">Middleware</span><span class="p">(</span><span class="nx">httptransport</span><span class="p">.</span><span class="nx">Options</span><span class="p">{</span>
 <span class="w">        </span><span class="nx">Logger</span><span class="p">:</span><span class="w"> </span><span class="nx">logger</span><span class="p">,</span><span class="w"> </span><span class="nx">ServiceName</span><span class="p">:</span><span class="w"> </span><span class="s">"myapp"</span><span class="p">,</span>
@@ -690,6 +692,9 @@ Neither package requires Fx or an HTTP server.</p>
 <code>httpapi.NewHandler(logger)</code> as its <code>Handler</code>. Import <code>internal/httpapi</code> using
 your application's module path. Keep your server's existing listener, timeouts,
 and shutdown handling.</p>
+<p>To use Zodiac error responses, assign both error factories once at startup,
+before creating APIs or serving requests. They apply to all Huma APIs in the
+process. Generated projects include this setup.</p>
 <p>Once that server is running, request <code>/tickets/1</code> for the sample ticket and
 <code>/tickets/2</code> for a public 404. Interactive API documentation is served at <code>/docs</code>.
 The <a href="../http/">ticket tutorial</a> shows how to inject a business service when using Fx.</p>
