@@ -2,10 +2,12 @@ package user
 
 import (
 	"context"
+	"errors"
 	"net/http"
 
 	"github.com/danielgtaylor/huma/v2"
 
+	"github.com/TTWShell/zodiac-core/response"
 	humatransport "github.com/TTWShell/zodiac-core/transport/huma"
 )
 
@@ -29,6 +31,10 @@ func Register(api huma.API, service *Service) {
 		Summary:     "Get a user",
 		Errors:      []int{http.StatusNotFound},
 	}, func(ctx context.Context, input *GetInput) (*User, error) {
-		return service.Get(ctx, input.ID)
+		user, err := service.Get(ctx, input.ID)
+		if errors.Is(err, ErrNotFound) {
+			return nil, response.NewError(http.StatusNotFound, "User not found")
+		}
+		return user, err
 	})
 }
