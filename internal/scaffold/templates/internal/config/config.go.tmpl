@@ -3,6 +3,7 @@ package config
 
 import (
 	"errors"
+	"fmt"
 	"net"
 	"strconv"
 	"time"
@@ -15,10 +16,13 @@ type Options struct {
 	Directory string
 }
 
-// HTTPConfig configures the HTTP listener and request header timeout.
+// HTTPConfig configures the HTTP listener and timeouts.
 type HTTPConfig struct {
 	Addr              string        `mapstructure:"addr"`
 	ReadHeaderTimeout time.Duration `mapstructure:"read_header_timeout"`
+	ReadTimeout       time.Duration `mapstructure:"read_timeout"`
+	WriteTimeout      time.Duration `mapstructure:"write_timeout"`
+	IdleTimeout       time.Duration `mapstructure:"idle_timeout"`
 }
 
 // Config holds the application's settings and resolved environment.
@@ -52,7 +56,7 @@ func Load(options Options) (*Config, error) {
 	return cfg, nil
 }
 
-// Validate checks the listen address, port range, and positive header timeout.
+// Validate checks the listen address, port range, and positive timeouts.
 func (c *Config) Validate() error {
 	_, port, err := net.SplitHostPort(c.HTTP.Addr)
 	if err != nil {
@@ -62,8 +66,15 @@ func (c *Config) Validate() error {
 	if err != nil || number < 0 || number > 65535 {
 		return errors.New("http.addr must contain a port between 0 and 65535")
 	}
-	if c.HTTP.ReadHeaderTimeout <= 0 {
-		return errors.New("http.read_header_timeout must be positive")
+	for name, timeout := range map[string]time.Duration{
+		"read_header_timeout": c.HTTP.ReadHeaderTimeout,
+		"read_timeout":        c.HTTP.ReadTimeout,
+		"write_timeout":       c.HTTP.WriteTimeout,
+		"idle_timeout":        c.HTTP.IdleTimeout,
+	} {
+		if timeout <= 0 {
+			return fmt.Errorf("http.%s must be positive", name)
+		}
 	}
 	return nil
 }

@@ -4,6 +4,7 @@ import (
 	"context"
 	"net/http"
 	"sync"
+	"time"
 
 	"github.com/coder/websocket"
 	"github.com/danielgtaylor/huma/v2"
@@ -49,6 +50,15 @@ func (h *Handler) serve(ctx huma.Context) {
 	h.mu.Unlock()
 	defer h.handlers.Done()
 
+	controller := http.NewResponseController(w)
+	if err := controller.SetReadDeadline(time.Time{}); err != nil {
+		httptransport.ErrorHandler(http.StatusInternalServerError)(w, r)
+		return
+	}
+	if err := controller.SetWriteDeadline(time.Time{}); err != nil {
+		httptransport.ErrorHandler(http.StatusInternalServerError)(w, r)
+		return
+	}
 	conn, err := websocket.Accept(w, r, nil)
 	if err != nil {
 		return

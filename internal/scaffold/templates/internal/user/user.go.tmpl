@@ -3,11 +3,11 @@ package user
 
 import (
 	"context"
+	"errors"
 	"log/slog"
-	"net/http"
-
-	"github.com/TTWShell/zodiac-core/response"
 )
+
+var ErrNotFound = errors.New("user not found")
 
 type User struct {
 	ID   int    `json:"id"`
@@ -44,5 +44,5 @@ func (s *Service) Get(ctx context.Context, id int) (*User, error) {
 		user := s.users[i]
 		return &user, nil
 	}
-	return nil, response.NewError(http.StatusNotFound, "User not found")
+	return nil, ErrNotFound
 }
