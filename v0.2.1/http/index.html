@@ -1,0 +1,1015 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Shared foundations for Go services.">
+      
+      
+      
+        <link rel="canonical" href="https://ttwshell.github.io/zodiac-core/v0.2.1/http/">
+      
+      
+        <link rel="prev" href="../getting-started/">
+      
+      
+        <link rel="next" href="../websockets/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.8.2">
+    
+    
+      
+        <title>Add a business endpoint - ZodiacCore Go</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.57a0d79d.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    <body dir="ltr">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#add-a-business-endpoint" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+      <div data-md-color-scheme="default" data-md-component="outdated" hidden>
+        
+      </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href=".." title="ZodiacCore Go" class="md-header__button md-logo" aria-label="ZodiacCore Go" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            ZodiacCore Go
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Add a business endpoint
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/TTWShell/zodiac-core" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="ZodiacCore Go" class="md-nav__button md-logo" aria-label="ZodiacCore Go" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    ZodiacCore Go
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/TTWShell/zodiac-core" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../getting-started/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Create a service
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Add a business endpoint
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Add a business endpoint
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#write-the-ticket-service-and-route" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Write the ticket service and route
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#connect-the-service-to-your-application" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Connect the service to your application
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#try-the-endpoint" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Try the endpoint
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#return-other-results" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Return other results
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#return-xml-or-other-formats" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Return XML or other formats
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../websockets/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Add a WebSocket endpoint
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../existing-application/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Existing applications
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../configuration/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Configure your application
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../logging/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Write and correlate logs
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../cli/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    CLI installation and options
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../changelog/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Changelog
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="https://pkg.go.dev/github.com/TTWShell/zodiac-core" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    API reference
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#write-the-ticket-service-and-route" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Write the ticket service and route
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#connect-the-service-to-your-application" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Connect the service to your application
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#try-the-endpoint" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Try the endpoint
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#return-other-results" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Return other results
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#return-xml-or-other-formats" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Return XML or other formats
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+
+<h1 id="add-a-business-endpoint">Add a business endpoint</h1>
+<p>Add <code>GET /tickets/{id}</code> to the <code>myapp</code> project from
+<a href="../getting-started/">Create a service</a>. A client will receive a ticket, a 404 when
+it does not exist, or a validation error when its ID is invalid.</p>
+<p>First, follow <a href="../configuration/#add-a-business-setting">Add a business setting</a>
+to define <code>cfg.Support.Team</code>, add its YAML value, and bind <code>MYAPP_SUPPORT_TEAM</code>.</p>
+<h2 id="write-the-ticket-service-and-route">Write the ticket service and route</h2>
+<p>Create <code>internal/tickets/tickets.go</code> with the following contents. The example
+contains one read-only sample ticket so you can try the API without a database.</p>
+<div class="highlight"><pre><span></span><code><span class="kn">package</span><span class="w"> </span><span class="nx">tickets</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="p">(</span>
+<span class="w">    </span><span class="s">"context"</span>
+<span class="w">    </span><span class="s">"log/slog"</span>
+<span class="w">    </span><span class="s">"net/http"</span>
+
+<span class="w">    </span><span class="s">"github.com/danielgtaylor/huma/v2"</span>
+
+<span class="w">    </span><span class="s">"github.com/TTWShell/zodiac-core/response"</span>
+<span class="w">    </span><span class="nx">humatransport</span><span class="w"> </span><span class="s">"github.com/TTWShell/zodiac-core/transport/huma"</span>
+<span class="p">)</span>
+
+<span class="kd">type</span><span class="w"> </span><span class="nx">Ticket</span><span class="w"> </span><span class="kd">struct</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nx">ID</span><span class="w">    </span><span class="kt">int</span><span class="w">    </span><span class="s">`json:"id"`</span>
+<span class="w">    </span><span class="nx">Title</span><span class="w"> </span><span class="kt">string</span><span class="w"> </span><span class="s">`json:"title"`</span>
+<span class="w">    </span><span class="nx">Team</span><span class="w">  </span><span class="kt">string</span><span class="w"> </span><span class="s">`json:"team"`</span>
+<span class="p">}</span>
+
+<span class="kd">type</span><span class="w"> </span><span class="nx">Service</span><span class="w"> </span><span class="kd">struct</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nx">logger</span><span class="w">  </span><span class="o">*</span><span class="nx">slog</span><span class="p">.</span><span class="nx">Logger</span>
+<span class="w">    </span><span class="nx">tickets</span><span class="w"> </span><span class="kt">map</span><span class="p">[</span><span class="kt">int</span><span class="p">]</span><span class="nx">Ticket</span>
+<span class="p">}</span>
+
+<span class="kd">func</span><span class="w"> </span><span class="nx">NewService</span><span class="p">(</span><span class="nx">team</span><span class="w"> </span><span class="kt">string</span><span class="p">,</span><span class="w"> </span><span class="nx">logger</span><span class="w"> </span><span class="o">*</span><span class="nx">slog</span><span class="p">.</span><span class="nx">Logger</span><span class="p">)</span><span class="w"> </span><span class="o">*</span><span class="nx">Service</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="o">&amp;</span><span class="nx">Service</span><span class="p">{</span>
+<span class="w">        </span><span class="nx">logger</span><span class="p">:</span><span class="w"> </span><span class="nx">logger</span><span class="p">,</span>
+<span class="w">        </span><span class="nx">tickets</span><span class="p">:</span><span class="w"> </span><span class="kt">map</span><span class="p">[</span><span class="kt">int</span><span class="p">]</span><span class="nx">Ticket</span><span class="p">{</span>
+<span class="w">            </span><span class="mi">1</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="nx">ID</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="nx">Title</span><span class="p">:</span><span class="w"> </span><span class="s">"Cannot sign in"</span><span class="p">,</span><span class="w"> </span><span class="nx">Team</span><span class="p">:</span><span class="w"> </span><span class="nx">team</span><span class="p">},</span>
+<span class="w">        </span><span class="p">},</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+
+<span class="kd">func</span><span class="w"> </span><span class="p">(</span><span class="nx">s</span><span class="w"> </span><span class="o">*</span><span class="nx">Service</span><span class="p">)</span><span class="w"> </span><span class="nx">Get</span><span class="p">(</span><span class="nx">ctx</span><span class="w"> </span><span class="nx">context</span><span class="p">.</span><span class="nx">Context</span><span class="p">,</span><span class="w"> </span><span class="nx">id</span><span class="w"> </span><span class="kt">int</span><span class="p">)</span><span class="w"> </span><span class="p">(</span><span class="o">*</span><span class="nx">Ticket</span><span class="p">,</span><span class="w"> </span><span class="kt">error</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nx">ticket</span><span class="p">,</span><span class="w"> </span><span class="nx">ok</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">s</span><span class="p">.</span><span class="nx">tickets</span><span class="p">[</span><span class="nx">id</span><span class="p">]</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="o">!</span><span class="nx">ok</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="kc">nil</span><span class="p">,</span><span class="w"> </span><span class="nx">response</span><span class="p">.</span><span class="nx">NewError</span><span class="p">(</span><span class="nx">http</span><span class="p">.</span><span class="nx">StatusNotFound</span><span class="p">,</span><span class="w"> </span><span class="s">"Ticket not found"</span><span class="p">)</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="w">    </span><span class="nx">s</span><span class="p">.</span><span class="nx">logger</span><span class="p">.</span><span class="nx">InfoContext</span><span class="p">(</span><span class="nx">ctx</span><span class="p">,</span><span class="w"> </span><span class="s">"Ticket retrieved"</span><span class="p">,</span><span class="w"> </span><span class="s">"ticket_id"</span><span class="p">,</span><span class="w"> </span><span class="nx">id</span><span class="p">)</span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="o">&amp;</span><span class="nx">ticket</span><span class="p">,</span><span class="w"> </span><span class="kc">nil</span>
+<span class="p">}</span>
+
+<span class="kd">type</span><span class="w"> </span><span class="nx">GetInput</span><span class="w"> </span><span class="kd">struct</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nx">ID</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="s">`path:"id" minimum:"1"`</span>
+<span class="p">}</span>
+
+<span class="kd">func</span><span class="w"> </span><span class="nx">Register</span><span class="p">(</span><span class="nx">api</span><span class="w"> </span><span class="nx">huma</span><span class="p">.</span><span class="nx">API</span><span class="p">,</span><span class="w"> </span><span class="nx">service</span><span class="w"> </span><span class="o">*</span><span class="nx">Service</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nx">humatransport</span><span class="p">.</span><span class="nx">Register</span><span class="p">(</span><span class="nx">api</span><span class="p">,</span><span class="w"> </span><span class="nx">huma</span><span class="p">.</span><span class="nx">Operation</span><span class="p">{</span>
+<span class="w">        </span><span class="nx">OperationID</span><span class="p">:</span><span class="w"> </span><span class="s">"get-ticket"</span><span class="p">,</span>
+<span class="w">        </span><span class="nx">Method</span><span class="p">:</span><span class="w">      </span><span class="nx">http</span><span class="p">.</span><span class="nx">MethodGet</span><span class="p">,</span>
+<span class="w">        </span><span class="nx">Path</span><span class="p">:</span><span class="w">        </span><span class="s">"/tickets/{id}"</span><span class="p">,</span>
+<span class="w">        </span><span class="nx">Summary</span><span class="p">:</span><span class="w">     </span><span class="s">"Get a ticket"</span><span class="p">,</span>
+<span class="w">        </span><span class="nx">Errors</span><span class="p">:</span><span class="w">      </span><span class="p">[]</span><span class="kt">int</span><span class="p">{</span><span class="nx">http</span><span class="p">.</span><span class="nx">StatusNotFound</span><span class="p">},</span>
+<span class="w">    </span><span class="p">},</span><span class="w"> </span><span class="kd">func</span><span class="p">(</span><span class="nx">ctx</span><span class="w"> </span><span class="nx">context</span><span class="p">.</span><span class="nx">Context</span><span class="p">,</span><span class="w"> </span><span class="nx">input</span><span class="w"> </span><span class="o">*</span><span class="nx">GetInput</span><span class="p">)</span><span class="w"> </span><span class="p">(</span><span class="o">*</span><span class="nx">Ticket</span><span class="p">,</span><span class="w"> </span><span class="kt">error</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="nx">service</span><span class="p">.</span><span class="nx">Get</span><span class="p">(</span><span class="nx">ctx</span><span class="p">,</span><span class="w"> </span><span class="nx">input</span><span class="p">.</span><span class="nx">ID</span><span class="p">)</span>
+<span class="w">    </span><span class="p">})</span>
+<span class="p">}</span>
+</code></pre></div>
+<p>The handler returns business data. <code>Register</code> supplies the response envelope and
+exposes the input and output types in OpenAPI.</p>
+<h2 id="connect-the-service-to-your-application">Connect the service to your application</h2>
+<p>Create <code>internal/tickets/module.go</code>:</p>
+<div class="highlight"><pre><span></span><code><span class="kn">package</span><span class="w"> </span><span class="nx">tickets</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="p">(</span>
+<span class="w">    </span><span class="s">"log/slog"</span>
+
+<span class="w">    </span><span class="s">"go.uber.org/fx"</span>
+
+<span class="w">    </span><span class="s">"example.com/myapp/internal/config"</span>
+<span class="p">)</span>
+
+<span class="kd">func</span><span class="w"> </span><span class="nx">newService</span><span class="p">(</span><span class="nx">cfg</span><span class="w"> </span><span class="o">*</span><span class="nx">config</span><span class="p">.</span><span class="nx">Config</span><span class="p">,</span><span class="w"> </span><span class="nx">logger</span><span class="w"> </span><span class="o">*</span><span class="nx">slog</span><span class="p">.</span><span class="nx">Logger</span><span class="p">)</span><span class="w"> </span><span class="o">*</span><span class="nx">Service</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="nx">NewService</span><span class="p">(</span><span class="nx">cfg</span><span class="p">.</span><span class="nx">Support</span><span class="p">.</span><span class="nx">Team</span><span class="p">,</span><span class="w"> </span><span class="nx">logger</span><span class="p">)</span>
+<span class="p">}</span>
+
+<span class="kd">var</span><span class="w"> </span><span class="nx">Module</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">fx</span><span class="p">.</span><span class="nx">Module</span><span class="p">(</span><span class="s">"tickets"</span><span class="p">,</span>
+<span class="w">    </span><span class="nx">fx</span><span class="p">.</span><span class="nx">Provide</span><span class="p">(</span><span class="nx">newService</span><span class="p">),</span>
+<span class="w">    </span><span class="nx">fx</span><span class="p">.</span><span class="nx">Invoke</span><span class="p">(</span><span class="nx">Register</span><span class="p">),</span>
+<span class="p">)</span>
+</code></pre></div>
+<p>In <code>internal/app/app.go</code>, add this import:</p>
+<div class="highlight"><pre><span></span><code><span class="s">"example.com/myapp/internal/tickets"</span>
+</code></pre></div>
+<p>Add <code>tickets.Module</code> inside the existing <code>fx.New(...)</code> call, keeping its current
+options:</p>
+<div class="highlight"><pre><span></span><code><span class="nx">tickets</span><span class="p">.</span><span class="nx">Module</span><span class="p">,</span>
+</code></pre></div>
+<h2 id="try-the-endpoint">Try the endpoint</h2>
+<p>Start the application from its project directory:</p>
+<div class="highlight"><pre><span></span><code><span class="nv">APPLICATION_ENVIRONMENT</span><span class="o">=</span>develop<span class="w"> </span><span class="nv">MYAPP_SUPPORT_TEAM</span><span class="o">=</span>priority<span class="w"> </span>go<span class="w"> </span>run<span class="w"> </span>./cmd/myapp<span class="w"> </span>serve
+</code></pre></div>
+<p>Request the sample ticket:</p>
+<div class="highlight"><pre><span></span><code>curl<span class="w"> </span>-i<span class="w"> </span>http://127.0.0.1:8080/tickets/1
+</code></pre></div>
+<p>HTTP 200:</p>
+<div class="highlight"><pre><span></span><code><span class="p">{</span><span class="nt">"code"</span><span class="p">:</span><span class="mi">0</span><span class="p">,</span><span class="nt">"data"</span><span class="p">:{</span><span class="nt">"id"</span><span class="p">:</span><span class="mi">1</span><span class="p">,</span><span class="nt">"title"</span><span class="p">:</span><span class="s2">"Cannot sign in"</span><span class="p">,</span><span class="nt">"team"</span><span class="p">:</span><span class="s2">"priority"</span><span class="p">},</span><span class="nt">"message"</span><span class="p">:</span><span class="s2">"Success"</span><span class="p">}</span>
+</code></pre></div>
+<p>Request a ticket that does not exist:</p>
+<div class="highlight"><pre><span></span><code>curl<span class="w"> </span>-i<span class="w"> </span>http://127.0.0.1:8080/tickets/2
+</code></pre></div>
+<p>HTTP 404:</p>
+<div class="highlight"><pre><span></span><code><span class="p">{</span><span class="nt">"code"</span><span class="p">:</span><span class="mi">404</span><span class="p">,</span><span class="nt">"data"</span><span class="p">:</span><span class="kc">null</span><span class="p">,</span><span class="nt">"message"</span><span class="p">:</span><span class="s2">"Ticket not found"</span><span class="p">}</span>
+</code></pre></div>
+<p>Request <code>/tickets/0</code> to receive HTTP 422:</p>
+<div class="highlight"><pre><span></span><code><span class="p">{</span><span class="nt">"code"</span><span class="p">:</span><span class="mi">422</span><span class="p">,</span><span class="nt">"data"</span><span class="p">:{</span><span class="nt">"errors"</span><span class="p">:[{</span><span class="nt">"message"</span><span class="p">:</span><span class="s2">"expected number &gt;= 1"</span><span class="p">,</span><span class="nt">"location"</span><span class="p">:</span><span class="s2">"path.id"</span><span class="p">,</span><span class="nt">"value"</span><span class="p">:</span><span class="mi">0</span><span class="p">}]},</span><span class="nt">"message"</span><span class="p">:</span><span class="s2">"validation failed"</span><span class="p">}</span>
+</code></pre></div>
+<p>Visit <a href="http://127.0.0.1:8080/docs">http://127.0.0.1:8080/docs</a> to see and call the new operation.</p>
+<p>The successful request also emits a <code>Ticket retrieved</code> log with <code>ticket_id</code> and
+<code>request_id</code>. Compare the latter with the response's <code>X-Request-ID</code> header.
+See <a href="../logging/">logging</a> for recording additional business events.</p>
+<h2 id="return-other-results">Return other results</h2>
+<table>
+<thead>
+<tr>
+<th>What the endpoint needs</th>
+<th>What to use</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Business data with the standard envelope</td>
+<td><code>humatransport.Register</code></td>
+</tr>
+<tr>
+<td>HTTP 201 after creating a resource</td>
+<td><code>Register</code> with <code>DefaultStatus: http.StatusCreated</code></td>
+</tr>
+<tr>
+<td>A public business failure</td>
+<td>Return <code>response.NewError(status, message)</code></td>
+</tr>
+<tr>
+<td>Response headers or a custom body</td>
+<td><code>humatransport.RegisterOutput</code></td>
+</tr>
+<tr>
+<td>A stream or HTTP 204 with no body</td>
+<td><code>RegisterOutput</code> with Huma's corresponding output type</td>
+</tr>
+</tbody>
+</table>
+<p>A nil result from <code>Register</code> is returned as <code>data: null</code> within the envelope.
+Creation responses use business code <code>201</code> and message <code>Created</code>. Other successful
+<code>Register</code> responses use code <code>0</code> and message <code>Success</code>.</p>
+<p>Business error codes default to the HTTP status. Set the returned error's <code>Code</code>
+and <code>Data</code> fields if clients need an application-specific code or public details.
+Huma errors use the same envelope and retain their HTTP status and explicit
+message. Client error details appear in <code>data.errors</code>; without details, <code>data</code>
+is null. For 5xx errors, causes are logged instead of included in the response.
+Unexpected handler errors return a generic HTTP 500 response.</p>
+<p>Declare error statuses in the operation's <code>Errors</code> field. Use <code>Responses</code> for
+custom response documentation; an entry in <code>Errors</code> overrides <code>Responses</code> for
+the same status.</p>
+<p>To combine a header with a Zodiac envelope using <code>RegisterOutput</code>, declare:</p>
+<div class="highlight"><pre><span></span><code><span class="kd">type</span><span class="w"> </span><span class="nx">TicketOutput</span><span class="w"> </span><span class="kd">struct</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nx">ETag</span><span class="w"> </span><span class="kt">string</span><span class="w"> </span><span class="s">`header:"ETag"`</span>
+<span class="w">    </span><span class="nx">Body</span><span class="w"> </span><span class="nx">humatransport</span><span class="p">.</span><span class="nx">Body</span><span class="p">[</span><span class="nx">Ticket</span><span class="p">]</span>
+<span class="p">}</span>
+</code></pre></div>
+<p>Return <code>&amp;TicketOutput{ETag: etag, Body: humatransport.Body[Ticket](response.OK(ticket))}</code>
+from its handler, where <code>ticket</code> is a <code>Ticket</code> value. See
+<a href="https://huma.rocks/features/response-outputs/">Huma response outputs</a> for streaming
+and empty responses, and the
+<a href="https://pkg.go.dev/github.com/TTWShell/zodiac-core/transport/huma">registration API reference</a>
+for complete signatures.</p>
+<p>For long-lived streams, clear the server's write deadline at the start of the
+<code>huma.StreamResponse.Body</code> callback, before writing headers or data. With the
+Chi adapter, use these imports:</p>
+<div class="highlight"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="p">(</span>
+<span class="w">    </span><span class="s">"net/http"</span>
+<span class="w">    </span><span class="s">"time"</span>
+
+<span class="w">    </span><span class="s">"github.com/danielgtaylor/huma/v2/adapters/humachi"</span>
+<span class="w">    </span><span class="nx">httptransport</span><span class="w"> </span><span class="s">"github.com/TTWShell/zodiac-core/transport/http"</span>
+<span class="p">)</span>
+</code></pre></div>
+<div class="highlight"><pre><span></span><code><span class="nx">r</span><span class="p">,</span><span class="w"> </span><span class="nx">w</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">humachi</span><span class="p">.</span><span class="nx">Unwrap</span><span class="p">(</span><span class="nx">ctx</span><span class="p">)</span>
+<span class="k">if</span><span class="w"> </span><span class="nx">err</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">http</span><span class="p">.</span><span class="nx">NewResponseController</span><span class="p">(</span><span class="nx">w</span><span class="p">).</span><span class="nx">SetWriteDeadline</span><span class="p">(</span><span class="nx">time</span><span class="p">.</span><span class="nx">Time</span><span class="p">{});</span><span class="w"> </span><span class="nx">err</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="kc">nil</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nx">httptransport</span><span class="p">.</span><span class="nx">ErrorHandler</span><span class="p">(</span><span class="nx">http</span><span class="p">.</span><span class="nx">StatusInternalServerError</span><span class="p">)(</span><span class="nx">w</span><span class="p">,</span><span class="w"> </span><span class="nx">r</span><span class="p">)</span>
+<span class="w">    </span><span class="k">return</span>
+<span class="p">}</span>
+</code></pre></div>
+<p>Use a future deadline instead of <code>time.Time{}</code> to set a per-request limit.
+An already expired deadline cannot be extended; see
+<a href="https://pkg.go.dev/net/http#ResponseController.SetWriteDeadline"><code>SetWriteDeadline</code></a>.</p>
+<h2 id="return-xml-or-other-formats">Return XML or other formats</h2>
+<p>Use <code>RegisterOutput</code> with a <code>Content-Type</code> header and a <code>[]byte</code> body to send XML,
+HTML, CSV, or binary data. The bytes are sent as-is, without a JSON envelope.</p>
+<p>To add an XML export to the ticket example, import <code>encoding/xml</code> in
+<code>internal/tickets/tickets.go</code> and add these types:</p>
+<div class="highlight"><pre><span></span><code><span class="kd">type</span><span class="w"> </span><span class="nx">ticketXML</span><span class="w"> </span><span class="kd">struct</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nx">XMLName</span><span class="w"> </span><span class="nx">xml</span><span class="p">.</span><span class="nx">Name</span><span class="w"> </span><span class="s">`xml:"ticket"`</span>
+<span class="w">    </span><span class="nx">ID</span><span class="w">      </span><span class="kt">int</span><span class="w">      </span><span class="s">`xml:"id"`</span>
+<span class="w">    </span><span class="nx">Title</span><span class="w">   </span><span class="kt">string</span><span class="w">   </span><span class="s">`xml:"title"`</span>
+<span class="w">    </span><span class="nx">Team</span><span class="w">    </span><span class="kt">string</span><span class="w">   </span><span class="s">`xml:"team"`</span>
+<span class="p">}</span>
+
+<span class="kd">type</span><span class="w"> </span><span class="nx">xmlOutput</span><span class="w"> </span><span class="kd">struct</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nx">ContentType</span><span class="w"> </span><span class="kt">string</span><span class="w"> </span><span class="s">`header:"Content-Type"`</span>
+<span class="w">    </span><span class="nx">Body</span><span class="w">        </span><span class="p">[]</span><span class="kt">byte</span>
+<span class="p">}</span>
+</code></pre></div>
+<p>Add this registration inside the existing <code>Register</code> function:</p>
+<div class="highlight"><pre><span></span><code><span class="nx">humatransport</span><span class="p">.</span><span class="nx">RegisterOutput</span><span class="p">(</span><span class="nx">api</span><span class="p">,</span><span class="w"> </span><span class="nx">huma</span><span class="p">.</span><span class="nx">Operation</span><span class="p">{</span>
+<span class="w">    </span><span class="nx">OperationID</span><span class="p">:</span><span class="w"> </span><span class="s">"export-ticket-xml"</span><span class="p">,</span>
+<span class="w">    </span><span class="nx">Method</span><span class="p">:</span><span class="w">      </span><span class="nx">http</span><span class="p">.</span><span class="nx">MethodGet</span><span class="p">,</span>
+<span class="w">    </span><span class="nx">Path</span><span class="p">:</span><span class="w">        </span><span class="s">"/tickets/{id}/xml"</span><span class="p">,</span>
+<span class="w">    </span><span class="nx">Errors</span><span class="p">:</span><span class="w">      </span><span class="p">[]</span><span class="kt">int</span><span class="p">{</span><span class="nx">http</span><span class="p">.</span><span class="nx">StatusNotFound</span><span class="p">},</span>
+<span class="w">    </span><span class="nx">Responses</span><span class="p">:</span><span class="w"> </span><span class="kt">map</span><span class="p">[</span><span class="kt">string</span><span class="p">]</span><span class="o">*</span><span class="nx">huma</span><span class="p">.</span><span class="nx">Response</span><span class="p">{</span>
+<span class="w">        </span><span class="s">"200"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="nx">Description</span><span class="p">:</span><span class="w"> </span><span class="s">"Ticket as XML"</span><span class="p">,</span>
+<span class="w">            </span><span class="nx">Content</span><span class="p">:</span><span class="w"> </span><span class="kt">map</span><span class="p">[</span><span class="kt">string</span><span class="p">]</span><span class="o">*</span><span class="nx">huma</span><span class="p">.</span><span class="nx">MediaType</span><span class="p">{</span>
+<span class="w">                </span><span class="s">"application/xml"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="nx">Schema</span><span class="p">:</span><span class="w"> </span><span class="o">&amp;</span><span class="nx">huma</span><span class="p">.</span><span class="nx">Schema</span><span class="p">{</span><span class="nx">Type</span><span class="p">:</span><span class="w"> </span><span class="s">"string"</span><span class="p">}},</span>
+<span class="w">            </span><span class="p">},</span>
+<span class="w">        </span><span class="p">},</span>
+<span class="w">    </span><span class="p">},</span>
+<span class="p">},</span><span class="w"> </span><span class="kd">func</span><span class="p">(</span><span class="nx">ctx</span><span class="w"> </span><span class="nx">context</span><span class="p">.</span><span class="nx">Context</span><span class="p">,</span><span class="w"> </span><span class="nx">input</span><span class="w"> </span><span class="o">*</span><span class="nx">GetInput</span><span class="p">)</span><span class="w"> </span><span class="p">(</span><span class="o">*</span><span class="nx">xmlOutput</span><span class="p">,</span><span class="w"> </span><span class="kt">error</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nx">ticket</span><span class="p">,</span><span class="w"> </span><span class="nx">err</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">service</span><span class="p">.</span><span class="nx">Get</span><span class="p">(</span><span class="nx">ctx</span><span class="p">,</span><span class="w"> </span><span class="nx">input</span><span class="p">.</span><span class="nx">ID</span><span class="p">)</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="nx">err</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="kc">nil</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="kc">nil</span><span class="p">,</span><span class="w"> </span><span class="nx">err</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="w">    </span><span class="nx">body</span><span class="p">,</span><span class="w"> </span><span class="nx">err</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">xml</span><span class="p">.</span><span class="nx">Marshal</span><span class="p">(</span><span class="nx">ticketXML</span><span class="p">{</span>
+<span class="w">        </span><span class="nx">ID</span><span class="p">:</span><span class="w"> </span><span class="nx">ticket</span><span class="p">.</span><span class="nx">ID</span><span class="p">,</span><span class="w"> </span><span class="nx">Title</span><span class="p">:</span><span class="w"> </span><span class="nx">ticket</span><span class="p">.</span><span class="nx">Title</span><span class="p">,</span><span class="w"> </span><span class="nx">Team</span><span class="p">:</span><span class="w"> </span><span class="nx">ticket</span><span class="p">.</span><span class="nx">Team</span><span class="p">,</span>
+<span class="w">    </span><span class="p">})</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="nx">err</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="kc">nil</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="kc">nil</span><span class="p">,</span><span class="w"> </span><span class="nx">err</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="o">&amp;</span><span class="nx">xmlOutput</span><span class="p">{</span><span class="nx">ContentType</span><span class="p">:</span><span class="w"> </span><span class="s">"application/xml"</span><span class="p">,</span><span class="w"> </span><span class="nx">Body</span><span class="p">:</span><span class="w"> </span><span class="nx">body</span><span class="p">},</span><span class="w"> </span><span class="kc">nil</span>
+<span class="p">})</span>
+</code></pre></div>
+<p>Restart the service and request the export:</p>
+<div class="highlight"><pre><span></span><code>curl<span class="w"> </span>-i<span class="w"> </span>http://127.0.0.1:8080/tickets/1/xml
+</code></pre></div>
+<p>The response has HTTP 200 and <code>Content-Type: application/xml</code>:</p>
+<div class="highlight"><pre><span></span><code><span class="nt">&lt;ticket&gt;&lt;id&gt;</span>1<span class="nt">&lt;/id&gt;&lt;title&gt;</span>Cannot<span class="w"> </span>sign<span class="w"> </span>in<span class="nt">&lt;/title&gt;&lt;team&gt;</span>priority<span class="nt">&lt;/team&gt;&lt;/ticket&gt;</span>
+</code></pre></div>
+<p>The handler selects the format by writing those bytes. Sending
+<code>Accept: application/xml</code> to the JSON ticket endpoint does not change its
+response. With the default API configuration, a missing ticket or invalid ID
+still returns the Zodiac JSON error envelope.</p>
+<p>For other formats, use the same output shape with the corresponding bytes and
+content type, such as <code>text/html</code>, <code>text/csv</code>, or <code>application/octet-stream</code>.
+Declare that media type in <code>Responses</code> so OpenAPI describes the response clients
+actually receive.</p>
+<p>If an endpoint also accepts XML, name that media type on the raw body and decode
+it in the handler:</p>
+<div class="highlight"><pre><span></span><code><span class="kd">type</span><span class="w"> </span><span class="nx">xmlInput</span><span class="w"> </span><span class="kd">struct</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nx">RawBody</span><span class="w"> </span><span class="p">[]</span><span class="kt">byte</span><span class="w"> </span><span class="s">`contentType:"application/xml"`</span>
+<span class="p">}</span>
+</code></pre></div>
+<p>Decode <code>RawBody</code> with <code>xml.Unmarshal</code> and validate the result in the handler.
+Huma does not validate that XML. Return
+<code>response.NewError(http.StatusBadRequest, "invalid XML")</code> for malformed XML.
+Without the <code>contentType</code> tag, OpenAPI describes the request as
+<code>application/octet-stream</code>.</p>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["content.code.copy", "navigation.sections"], "search": "../assets/javascripts/workers/search.a7633da7.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"provider": "mike"}}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.a5f9d56c.min.js"></script>
+      
+    
+  </body>
+</html>
