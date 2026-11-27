@@ -198,6 +198,32 @@ and empty responses, and the
 [registration API reference](https://pkg.go.dev/github.com/TTWShell/zodiac-core/transport/huma)
 for complete signatures.
 
+For long-lived streams, clear the server's write deadline at the start of the
+`huma.StreamResponse.Body` callback, before writing headers or data. With the
+Chi adapter, use these imports:
+
+```go
+import (
+    "net/http"
+    "time"
+
+    "github.com/danielgtaylor/huma/v2/adapters/humachi"
+    httptransport "github.com/TTWShell/zodiac-core/transport/http"
+)
+```
+
+```go
+r, w := humachi.Unwrap(ctx)
+if err := http.NewResponseController(w).SetWriteDeadline(time.Time{}); err != nil {
+    httptransport.ErrorHandler(http.StatusInternalServerError)(w, r)
+    return
+}
+```
+
+Use a future deadline instead of `time.Time{}` to set a per-request limit.
+An already expired deadline cannot be extended; see
+[`SetWriteDeadline`](https://pkg.go.dev/net/http#ResponseController.SetWriteDeadline).
+
 ## Return XML or other formats
 
 Use `RegisterOutput` with a `Content-Type` header and a `[]byte` body to send XML,

@@ -26,6 +26,8 @@ type pausedUpgrade struct {
 	entered, release chan struct{}
 }
 
+func (w pausedUpgrade) Unwrap() http.ResponseWriter { return w.ResponseWriter }
+
 func (w pausedUpgrade) Hijack() (net.Conn, *bufio.ReadWriter, error) {
 	conn, rw, err := w.ResponseWriter.(http.Hijacker).Hijack()
 	close(w.entered)
