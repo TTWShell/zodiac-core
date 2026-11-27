@@ -866,6 +866,26 @@ from its handler, where <code>ticket</code> is a <code>Ticket</code> value. See
 and empty responses, and the
 <a href="https://pkg.go.dev/github.com/TTWShell/zodiac-core/transport/huma">registration API reference</a>
 for complete signatures.</p>
+<p>For long-lived streams, clear the server's write deadline at the start of the
+<code>huma.StreamResponse.Body</code> callback, before writing headers or data. With the
+Chi adapter, use these imports:</p>
+<div class="highlight"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="p">(</span>
+<span class="w">    </span><span class="s">"net/http"</span>
+<span class="w">    </span><span class="s">"time"</span>
+
+<span class="w">    </span><span class="s">"github.com/danielgtaylor/huma/v2/adapters/humachi"</span>
+<span class="w">    </span><span class="nx">httptransport</span><span class="w"> </span><span class="s">"github.com/TTWShell/zodiac-core/transport/http"</span>
+<span class="p">)</span>
+</code></pre></div>
+<div class="highlight"><pre><span></span><code><span class="nx">r</span><span class="p">,</span><span class="w"> </span><span class="nx">w</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">humachi</span><span class="p">.</span><span class="nx">Unwrap</span><span class="p">(</span><span class="nx">ctx</span><span class="p">)</span>
+<span class="k">if</span><span class="w"> </span><span class="nx">err</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">http</span><span class="p">.</span><span class="nx">NewResponseController</span><span class="p">(</span><span class="nx">w</span><span class="p">).</span><span class="nx">SetWriteDeadline</span><span class="p">(</span><span class="nx">time</span><span class="p">.</span><span class="nx">Time</span><span class="p">{});</span><span class="w"> </span><span class="nx">err</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="kc">nil</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nx">httptransport</span><span class="p">.</span><span class="nx">ErrorHandler</span><span class="p">(</span><span class="nx">http</span><span class="p">.</span><span class="nx">StatusInternalServerError</span><span class="p">)(</span><span class="nx">w</span><span class="p">,</span><span class="w"> </span><span class="nx">r</span><span class="p">)</span>
+<span class="w">    </span><span class="k">return</span>
+<span class="p">}</span>
+</code></pre></div>
+<p>Use a future deadline instead of <code>time.Time{}</code> to set a per-request limit.
+An already expired deadline cannot be extended; see
+<a href="https://pkg.go.dev/net/http#ResponseController.SetWriteDeadline"><code>SetWriteDeadline</code></a>.</p>
 <h2 id="return-xml-or-other-formats">Return XML or other formats</h2>
 <p>Use <code>RegisterOutput</code> with a <code>Content-Type</code> header and a <code>[]byte</code> body to send XML,
 HTML, CSV, or binary data. The bytes are sent as-is, without a JSON envelope.</p>

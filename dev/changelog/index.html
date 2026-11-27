@@ -513,6 +513,45 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#021-2026-11-27" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        0.2.1 - 2026-11-27
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="0.2.1 - 2026-11-27">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#changed" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Changed
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#fixed" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Fixed
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#020-2026-11-26" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -536,7 +575,7 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#changed" class="md-nav__link">
+  <a href="#changed_1" class="md-nav__link">
     <span class="md-ellipsis">
       
         Changed
@@ -547,7 +586,7 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#fixed" class="md-nav__link">
+  <a href="#fixed_1" class="md-nav__link">
     <span class="md-ellipsis">
       
         Fixed
@@ -663,6 +702,45 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#021-2026-11-27" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        0.2.1 - 2026-11-27
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="0.2.1 - 2026-11-27">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#changed" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Changed
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#fixed" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Fixed
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#020-2026-11-26" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -686,7 +764,7 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#changed" class="md-nav__link">
+  <a href="#changed_1" class="md-nav__link">
     <span class="md-ellipsis">
       
         Changed
@@ -697,7 +775,7 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#fixed" class="md-nav__link">
+  <a href="#fixed_1" class="md-nav__link">
     <span class="md-ellipsis">
       
         Fixed
@@ -761,7 +839,17 @@
 <p>All notable changes to this project are documented in this file.</p>
 <p>The format is based on <a href="https://keepachangelog.com/en/1.1.0/">Keep a Changelog</a>,
 and this project adheres to <a href="https://semver.org/spec/v2.0.0.html">Semantic Versioning</a>.</p>
-<h2 id="unreleased"><a href="https://github.com/TTWShell/zodiac-core/compare/v0.2.0...HEAD">Unreleased</a></h2>
+<h2 id="unreleased"><a href="https://github.com/TTWShell/zodiac-core/compare/v0.2.1...HEAD">Unreleased</a></h2>
+<h2 id="021-2026-11-27"><a href="https://github.com/TTWShell/zodiac-core/compare/v0.2.0...v0.2.1">0.2.1</a> - 2026-11-27</h2>
+<h3 id="changed">Changed</h3>
+<ul>
+<li>The generated user service returns <code>ErrNotFound</code>; its HTTP handler maps that error to the existing 404 response.</li>
+<li>Streaming response documentation explains how to override the write deadline per request, and the WebSocket example clears read and write deadlines before upgrading.</li>
+</ul>
+<h3 id="fixed">Fixed</h3>
+<ul>
+<li>Newly generated services configure HTTP read, write, and idle timeouts with defaults of 15s, 30s, and 60s, alongside the existing 5s header timeout. All four must be positive. Existing applications must copy the configuration fields, validation, and server settings to adopt these defaults.</li>
+</ul>
 <h2 id="020-2026-11-26"><a href="https://github.com/TTWShell/zodiac-core/compare/v0.1.0...v0.2.0">0.2.0</a> - 2026-11-26</h2>
 <h3 id="added">Added</h3>
 <ul>
@@ -769,13 +857,13 @@ and this project adheres to <a href="https://semver.org/spec/v2.0.0.html">Semant
 <li><code>humatransport.NewError</code> and <code>humatransport.NewErrorWithContext</code> integrate Huma framework errors with Zodiac responses and request logging.</li>
 <li>Usage guides cover XML requests and raw XML, HTML, CSV, text, and binary responses. A WebSocket example demonstrates message handling and shutdown, including upgrades in progress.</li>
 </ul>
-<h3 id="changed">Changed</h3>
+<h3 id="changed_1">Changed</h3>
 <ul>
 <li>Generated services place the command in <code>cmd/&lt;name&gt;</code> and compose feature Fx modules from <code>internal/app</code>. HTTP setup lives in <code>internal/httpserver</code>; run newly generated services with <code>go run ./cmd/&lt;name&gt; serve</code>.</li>
 <li>Huma errors use the <code>code</code>/<code>data</code>/<code>message</code> envelope, with client error details in <code>data.errors</code>. Generated services install the error factories at startup; existing applications must assign <code>huma.NewError = humatransport.NewError</code> and <code>huma.NewErrorWithContext = humatransport.NewErrorWithContext</code> before creating APIs to apply this format to framework errors. These factories affect all Huma APIs in the process.</li>
 <li>Error documentation follows Huma's native <code>Errors</code> and <code>Responses</code> rules; an entry in <code>Errors</code> overrides <code>Responses</code> for the same status.</li>
 </ul>
-<h3 id="fixed">Fixed</h3>
+<h3 id="fixed_1">Fixed</h3>
 <ul>
 <li>Error normalization preserves response headers carried by wrapped errors and logs internal error causes without including those causes in responses.</li>
 </ul>

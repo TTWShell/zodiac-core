@@ -684,6 +684,7 @@ with the generated Chi adapter. Text and binary messages are echoed unchanged.</
 <span class="w">    </span><span class="s">"context"</span>
 <span class="w">    </span><span class="s">"net/http"</span>
 <span class="w">    </span><span class="s">"sync"</span>
+<span class="w">    </span><span class="s">"time"</span>
 
 <span class="w">    </span><span class="s">"github.com/coder/websocket"</span>
 <span class="w">    </span><span class="s">"github.com/danielgtaylor/huma/v2"</span>
@@ -729,6 +730,15 @@ with the generated Chi adapter. Text and binary messages are echoed unchanged.</
 <span class="w">    </span><span class="nx">h</span><span class="p">.</span><span class="nx">mu</span><span class="p">.</span><span class="nx">Unlock</span><span class="p">()</span>
 <span class="w">    </span><span class="k">defer</span><span class="w"> </span><span class="nx">h</span><span class="p">.</span><span class="nx">handlers</span><span class="p">.</span><span class="nx">Done</span><span class="p">()</span>
 
+<span class="w">    </span><span class="nx">controller</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">http</span><span class="p">.</span><span class="nx">NewResponseController</span><span class="p">(</span><span class="nx">w</span><span class="p">)</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="nx">err</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">controller</span><span class="p">.</span><span class="nx">SetReadDeadline</span><span class="p">(</span><span class="nx">time</span><span class="p">.</span><span class="nx">Time</span><span class="p">{});</span><span class="w"> </span><span class="nx">err</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="kc">nil</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="nx">httptransport</span><span class="p">.</span><span class="nx">ErrorHandler</span><span class="p">(</span><span class="nx">http</span><span class="p">.</span><span class="nx">StatusInternalServerError</span><span class="p">)(</span><span class="nx">w</span><span class="p">,</span><span class="w"> </span><span class="nx">r</span><span class="p">)</span>
+<span class="w">        </span><span class="k">return</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="nx">err</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">controller</span><span class="p">.</span><span class="nx">SetWriteDeadline</span><span class="p">(</span><span class="nx">time</span><span class="p">.</span><span class="nx">Time</span><span class="p">{});</span><span class="w"> </span><span class="nx">err</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="kc">nil</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="nx">httptransport</span><span class="p">.</span><span class="nx">ErrorHandler</span><span class="p">(</span><span class="nx">http</span><span class="p">.</span><span class="nx">StatusInternalServerError</span><span class="p">)(</span><span class="nx">w</span><span class="p">,</span><span class="w"> </span><span class="nx">r</span><span class="p">)</span>
+<span class="w">        </span><span class="k">return</span>
+<span class="w">    </span><span class="p">}</span>
 <span class="w">    </span><span class="nx">conn</span><span class="p">,</span><span class="w"> </span><span class="nx">err</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">websocket</span><span class="p">.</span><span class="nx">Accept</span><span class="p">(</span><span class="nx">w</span><span class="p">,</span><span class="w"> </span><span class="nx">r</span><span class="p">,</span><span class="w"> </span><span class="kc">nil</span><span class="p">)</span>
 <span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="nx">err</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="kc">nil</span><span class="w"> </span><span class="p">{</span>
 <span class="w">        </span><span class="k">return</span>
@@ -789,8 +799,10 @@ with the generated Chi adapter. Text and binary messages are echoed unchanged.</
 <span class="p">}</span>
 </code></pre></div>
 <p><code>RegisterOutput</code> passes control to the stream callback. <code>humachi.Unwrap</code> obtains
-the HTTP request and writer needed by <code>websocket.Accept</code>. The endpoint is hidden
-from OpenAPI because its messages are WebSocket frames, not HTTP response bodies.</p>
+the HTTP request and writer needed by <code>websocket.Accept</code>. The handler then clears
+the server's read and write deadlines. The
+endpoint is hidden from OpenAPI because its messages are WebSocket frames, not
+HTTP response bodies.</p>
 <h2 id="connect-the-module">Connect the module</h2>
 <p>Create <code>internal/echo/module.go</code>:</p>
 <div class="highlight"><pre><span></span><code><span class="kn">package</span><span class="w"> </span><span class="nx">echo</span>
