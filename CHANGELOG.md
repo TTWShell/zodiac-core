@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.2.1] - 2026-11-27
+
+### Changed
+
+- The generated user service returns `ErrNotFound`; its HTTP handler maps that error to the existing 404 response.
+- Streaming response documentation explains how to override the write deadline per request, and the WebSocket example clears read and write deadlines before upgrading.
+
+### Fixed
+
+- Newly generated services configure HTTP read, write, and idle timeouts with defaults of 15s, 30s, and 60s, alongside the existing 5s header timeout. All four must be positive. Existing applications must copy the configuration fields, validation, and server settings to adopt these defaults.
+
 ## [0.2.0] - 2026-11-26
 
 ### Added
@@ -38,6 +49,7 @@ Initial release. Requires Go 1.26.0 or newer.
 - JSON logging uses `slog` with configurable levels and request and service metadata.
 - Usage guides, versioned documentation, and CI checks cover the library and generated services across Go 1.26 and 1.27.
 
-[Unreleased]: https://github.com/TTWShell/zodiac-core/compare/v0.2.0...HEAD
+[Unreleased]: https://github.com/TTWShell/zodiac-core/compare/v0.2.1...HEAD
+[0.2.1]: https://github.com/TTWShell/zodiac-core/compare/v0.2.0...v0.2.1
 [0.2.0]: https://github.com/TTWShell/zodiac-core/compare/v0.1.0...v0.2.0
 [0.1.0]: https://github.com/TTWShell/zodiac-core/releases/tag/v0.1.0
